@@ -1,0 +1,39 @@
+{
+  "name": "code4mk/lara-stripe",
+  "description": "Laravel stripe payment",
+  "keywords": [
+    "stripe",
+    "stripe-php",
+    "laravel",
+    "laravel-payment",
+    "code4mk",
+    "0devco"
+  ],
+  "homepage": "https://github.com/code4mk/LaraStripe",
+  "support": {
+    "issues": "https://github.com/code4mk/LaraStripe/issues",
+    "source": "https://github.com/code4mk/LaraStripe"
+  },
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "code4mk",
+      "email": "hiremostafa@gmail.com",
+      "website": "https://code4mk.org"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Code4mk\\LaraStripe\\": "src/"
+    }
+  },
+  "extra": {
+    "laravel": {
+        "providers": [
+            "Code4mk\\LaraStripe\\LaraStripeServiceProvider"
+        ]
+    }
+  },
+  "prefer-stable": true,
+  "minimum-stability": "dev"
+}
