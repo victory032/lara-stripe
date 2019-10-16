@@ -15,11 +15,11 @@ use Config;
 
 class StripePaySession
 {
-
     private $currency = 'usd';
     private $description = 'Stripe payment checkout by lara-stripe';
-    private $amount;
+    private $products = [];
     private $secretKey;
+    private $publicKey;
     private $successURI;
     private $cancelURI;
     private $referenceID;
@@ -29,15 +29,18 @@ class StripePaySession
         if(config::get('lara-stripe.driver') === 'config') {
             $this->currency = config::get('lara-stripe.currency');
             $this->secretKey = config::get('lara-stripe.secret_key');
+            $this->publicKey = config::get('lara-stripe.public_key');
         }
     }
 
     public function setup($data)
     {
         $this->secretKey = $data['secret'];
+        $this->publicKey = $data['public_key'];
         $this->currency = strtolower($data['currency']);
         return $this;
     }
+
     public function configure($data)
     {
         $this->successURI = $data['success_url'];
@@ -46,37 +49,48 @@ class StripePaySession
         return $this;
     }
 
-    public function description($text)
+    public function publicKey()
     {
-        $this->description = $text;
-        return $this;
+        return $this->publicKey;
     }
 
-    public function amount($amount)
+    public function products($data)
     {
-        $this->amount = round($amount,2) * 100;
+        if (is_array($data) && sizeof($data) > 0) {
+            $this->products = $data;
+        }
         return $this;
     }
 
     public function getSession()
     {
-        Stripe::setApiKey($this->secretKey);
-        $session = Session::create([
-          'payment_method_types' => ['card'],
-          'line_items' => [[
-            'name' => 'T-shirt',
-            'description' => $this->description,
-            'images' => ['https://example.com/t-shirt.png'],
-            'amount' => $this->amount,
-            'currency' => 'usd',
-            'quantity' => 1,
-          ]],
-          'success_url' => $this->successURI,
-          'cancel_url' => $this->cancelURI,
-          'client_reference_id' => $this->referenceID,
 
-        ]);
-        return $session->id;
+        for($i=0;$i<sizeof($this->products);$i++){
+            $this->products[$i]['currency'] = $this->currency;
+            $this->products[$i]['amount'] = round($this->products[$i]['amount'],2) * 100;
+            if (!isset($this->products[$i]['description'])) {
+                $this->products[$i]['description'] = $this->description;
+            }
+            if (!isset($this->products[$i]['quantity'])) {
+                $this->products[$i]['quantity'] = 1;
+            }
+            if (!isset($this->products[$i]['images'])) {
+                $this->products[$i]['images'] = ['http://play.thelabcairns.com/images/stripe.jpg'];
+            }
+        }
+
+        Stripe::setApiKey($this->secretKey);
+        if (is_array($this->products) && sizeof($this->products) > 0) {
+            $session = Session::create([
+              'payment_method_types' => ['card'],
+              'line_items' => $this->products,
+              'success_url' => $this->successURI,
+              'cancel_url' => $this->cancelURI,
+              'client_reference_id' => $this->referenceID,
+
+            ]);
+            return $session->id;
+        }
     }
 
     public function retrieve($sessionToken)
@@ -85,6 +99,4 @@ class StripePaySession
         $infos = Session::retrieve($sessionToken);
         return $infos;
     }
-
-
 }
