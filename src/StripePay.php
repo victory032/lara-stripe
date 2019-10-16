@@ -21,6 +21,7 @@ class StripePay
     private $description = 'Stripe charge by lara-stripe';
     private $amount;
     private $secretKey;
+    private $publicKey;
     private $output;
     private $allOutput;
     private $error;
@@ -30,14 +31,21 @@ class StripePay
         if(config::get('lara-stripe.driver') === 'config') {
             $this->currency = config::get('lara-stripe.currency');
             $this->secretKey = config::get('lara-stripe.secret_key');
+            $this->secretKey = config::get('lara-stripe.public_key');
         }
     }
 
     public function setup($data)
     {
         $this->secretKey = $data['secret'];
+        $this->publicKey = $data['public_key'];
         $this->currency = strtolower($data['currency']);
         return $this;
+    }
+
+    public function publicKey()
+    {
+        return $this->publicKey;
     }
 
     public function card($data)
