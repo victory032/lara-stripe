@@ -10,17 +10,17 @@ namespace Code4mk\LaraStripe;
 use Stripe\Stripe;
 use Stripe\Token;
 use Stripe\Charge;
-use \Stripe\Checkout\Session;
+use Stripe\Checkout\Session;
 use Config;
 
 class StripePaySession
 {
 
     private $currency = 'usd';
-    private $description = 'Stripe charge by lara-stripe';
+    private $description = 'Stripe payment checkout by lara-stripe';
     private $amount;
     private $secretKey;
-    private $redirectURI;
+    private $successURI;
     private $cancelURI;
     private $referenceID;
 
@@ -40,7 +40,7 @@ class StripePaySession
     }
     public function configure($data)
     {
-        $this->redirectURI = $data['redirect_url'];
+        $this->successURI = $data['success_url'];
         $this->cancelURI = $data['cancel_url'];
         $this->referenceID = $data['ref_id'];
         return $this;
@@ -71,12 +71,19 @@ class StripePaySession
             'currency' => 'usd',
             'quantity' => 1,
           ]],
-          'success_url' => $this->redirectURI,
+          'success_url' => $this->successURI,
           'cancel_url' => $this->cancelURI,
           'client_reference_id' => $this->referenceID,
 
         ]);
         return $session->id;
+    }
+
+    public function retrieve($sessionToken)
+    {
+        Stripe::setApiKey($this->secretKey);
+        $infos = Session::retrieve($sessionToken);
+        return $infos;
     }
 
 

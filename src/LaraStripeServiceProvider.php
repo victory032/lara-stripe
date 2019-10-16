@@ -10,7 +10,8 @@ namespace Code4mk\LaraStripe;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Foundation\AliasLoader;
-use Code4mk\LaraStripe\StripePay as StripePay;
+use Code4mk\LaraStripe\StripePay;
+use Code4mk\LaraStripe\StripePaySession;
 
 class LaraStripeServiceProvider extends ServiceProvider
 {
@@ -27,8 +28,9 @@ class LaraStripeServiceProvider extends ServiceProvider
        $this->publishes([
         __DIR__ . '/../config/stripe.php' => config_path('lara-stripe.php')
        ], 'config');
-       
+
       AliasLoader::getInstance()->alias('LaraStripe', 'Code4mk\LaraStripe\Facades\LStripe');
+      AliasLoader::getInstance()->alias('LaraStripeSession', 'Code4mk\LaraStripe\Facades\LStripeSession');
    }
 
   /**
@@ -40,6 +42,10 @@ class LaraStripeServiceProvider extends ServiceProvider
    {
      $this->app->bind('laraStripe', function () {
       return new StripePay;
+     });
+
+     $this->app->bind('laraStripeSession', function () {
+      return new StripePaySession;
      });
    }
 }
