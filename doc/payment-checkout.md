@@ -59,12 +59,13 @@ LaraStripeSession::products([
 
 ## getSession
 
-getSession method return session id as like `cs_test_k8ep1Z7ndlRmAgl0JU0m7SciO8QjSpoFjAIDheeCtCflp4gRdBShozOs`
+getSession method return session id as like `cs_test_k8ep1Z7ndlRmAgl0JU0m7SciO8QjSpoFjAIDheeCtCflp4gRdBShozOs` and public key .
 
-* pass this session id with view
+* pass this data id with view
 
 ```php
 LaraStripeSession::getSession()
+// output ['sid'=> '','pkey'=> '']
 ```
 
 ## full code LaraStripeSession
@@ -72,7 +73,7 @@ LaraStripeSession::getSession()
 * session_id genereate
 
 ```php
-$sessionID = LaraStripeSession::setup([
+$session = LaraStripeSession::setup([
     'secret' => '********',
     'public_key' => '****',
     'currency' => 'usd'
@@ -115,6 +116,27 @@ stripe.redirectToCheckout({
   // using `result.error.message`.
 });
 ```
+
+* blade view
+
+```js
+var publicKey = '{{ $session['sid'] }}'
+var SessionID = '{{ $session['pkey'] }}'
+var stripe = Stripe(publicKey);
+
+stripe.redirectToCheckout({
+  // Make the id field from the Checkout Session creation API response
+  // available to this file, so you can provide it as parameter here
+  // instead of the {{CHECKOUT_SESSION_ID}} placeholder.
+  sessionId: SessionID
+}).then(function (result) {
+  // If `redirectToCheckout` fails due to a browser or network
+  // error, display the localized error message to your customer
+  // using `result.error.message`.
+});
+```
+
+
 
 * sessionId will be that code which generate  `getSession method`
 

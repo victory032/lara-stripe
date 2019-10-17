@@ -68,14 +68,8 @@ class StripePaySession
         for($i=0;$i<sizeof($this->products);$i++){
             $this->products[$i]['currency'] = $this->currency;
             $this->products[$i]['amount'] = round($this->products[$i]['amount'],2) * 100;
-            if (!isset($this->products[$i]['description'])) {
-                $this->products[$i]['description'] = $this->description;
-            }
             if (!isset($this->products[$i]['quantity'])) {
                 $this->products[$i]['quantity'] = 1;
-            }
-            if (!isset($this->products[$i]['images'])) {
-                $this->products[$i]['images'] = ['http://play.thelabcairns.com/images/stripe.jpg'];
             }
         }
 
