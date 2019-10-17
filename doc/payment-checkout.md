@@ -97,12 +97,16 @@ $session = LaraStripeSession::setup([
     ]
 ])
 ->getSession();
-
+// return view('checkout',['session' => $session]);
+// return response()->json($session)
 ```
 
 # stripe.js
 
+* include `<script src="https://js.stripe.com/v3/"></script>`
+
 ```js
+
 var stripe = Stripe('your_stripe_public_key');
 
 stripe.redirectToCheckout({
@@ -120,8 +124,8 @@ stripe.redirectToCheckout({
 * blade view
 
 ```js
-var publicKey = '{{ $session['sid'] }}'
-var SessionID = '{{ $session['pkey'] }}'
+var publicKey = '{{ $session['pkey'] }}'
+var SessionID = '{{ $session['sid'] }}'
 var stripe = Stripe(publicKey);
 
 stripe.redirectToCheckout({
