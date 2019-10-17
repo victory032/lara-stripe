@@ -89,7 +89,10 @@ class StripePaySession
               'client_reference_id' => $this->referenceID,
 
             ]);
-            return $session->id;
+            return [
+                    'sid' => $session->id,
+                    'pkey' => $this->publicKey
+                 ];
         }
     }
 
