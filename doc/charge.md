@@ -1,7 +1,7 @@
 
 # Stripe charge
 
-LaraStripe has payment checkout (session) alias `LaraStripe`.
+LaraStripe has charge alias `LaraStripe`.
 
 
 # Methods
@@ -72,4 +72,22 @@ get method return all datas.
 
 ```php
 LaraStripe::getAll();
+```
+
+# Full code
+
+```php
+$charge = LaraStripe::setup([
+    'secret_key' => '******',
+    'public_key' => '******',
+    'currency'   => 'usd'
+])
+->card($token)
+->amount(121.50)
+->metaData(['product_id'=>'p-121','purchase_id' => 'pur-12321'])
+->description('LaraStripe Laravel Stripe payment')
+->purchase()
+->get()
+// or
+// ->getAll()
 ```
