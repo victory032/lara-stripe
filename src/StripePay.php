@@ -10,6 +10,7 @@ namespace Code4mk\LaraStripe;
 use Stripe\Stripe;
 use Stripe\Token;
 use Stripe\Charge;
+use Stripe\Refund;
 use Config;
 
 class StripePay
@@ -177,5 +178,22 @@ class StripePay
 
             return (object) $output;
       }
+    }
+
+    public function refund($chargeID)
+    {
+        try {
+            Refund::create([
+                'charge' => $chargeID,
+            ]);
+            return ['refund'=>'true'];
+        } catch (\Exception $e) {
+            $error = [
+                'status' => 'error',
+                'error_msg' => $e->jsonBody{'error'}{'code'},
+            ];
+            return $error;
+        }
+
     }
 }
