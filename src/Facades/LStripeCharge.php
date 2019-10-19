@@ -10,7 +10,7 @@ namespace Code4mk\LaraStripe\Facades;
 
 use Illuminate\Support\Facades\Facade;
 
-class LStripe extends Facade
+class LStripeCharge extends Facade
 {
   /**
    * Get the registered name of the component.
@@ -19,6 +19,6 @@ class LStripe extends Facade
    */
   protected static function getFacadeAccessor()
   {
-      return 'laraStripe';
+      return 'laraStripeCharge';
   }
 }

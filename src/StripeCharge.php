@@ -13,7 +13,7 @@ use Stripe\Charge;
 use Stripe\Refund;
 use Config;
 
-class StripePay
+class StripeCharge
 {
     private $card = [];
     private $token = '';
@@ -39,7 +39,13 @@ class StripePay
             $this->secretKey = config::get('lara-stripe.public_key');
         }
     }
-
+    /**
+     * Set credentials, secret and public key
+     *
+     * Set stripe currency
+     * @param array $data
+     * @return $this
+     */
     public function setup($data)
     {
         $this->secretKey = $data['secret_key'];
@@ -48,11 +54,22 @@ class StripePay
         return $this;
     }
 
+    /**
+     * Retrive public key
+     *
+     * @return string
+     */
     public function publicKey()
     {
         return $this->publicKey;
     }
-
+    /**
+     * Set card info number,exp month,exp year and cvc.
+     *
+     * when pass string that is card token which generate by stripe.js
+     * @param array|string $data
+     * @return $this
+     */
     public function card($data)
     {
         if (is_array($data)) {
@@ -63,12 +80,16 @@ class StripePay
         } else {
             $this->token = $data;
         }
-
         $this->payOption = 'source';
-
         return $this;
     }
 
+    /**
+     * set customer id
+     * this method need for future charge as subcription
+     * @param string $data
+     * @return $this
+     */
     public function customer($data)
     {
         $this->token = $data;
@@ -77,24 +98,49 @@ class StripePay
         return $this;
     }
 
+    /**
+     * set charge amount
+     *
+     * @param float|int|double $amount
+     * @return $this
+     */
     public function amount($amount)
     {
         $this->amount = round($amount,2) * 100 ;
         return $this;
     }
 
+    /**
+     * set some data which will be need for charge/payment
+     *
+     * ex: tnx_id,product_id,order_id or simliar
+     *
+     * @param array $data
+     * @return $this
+     */
     public function metadata($data)
     {
         $this->metadata = $data;
         return $this;
     }
 
+    /**
+     * set charge description
+     *
+     * @param string $text
+     * @return $this
+     */
     public function description($text)
     {
         $this->description = $text;
         return $this;
     }
 
+    /**
+     * create charge
+     *
+     * @return $this
+     */
     public function purchase()
     {
         try {
@@ -133,6 +179,11 @@ class StripePay
         }
     }
 
+    /**
+     * Retrieve all charge's data
+     *
+     * @return object
+     */
     public function getAll()
     {
         if($this->error){
@@ -150,7 +201,7 @@ class StripePay
     }
 
     /**
-     * Return charge specific datas as object
+     * Retrieve charge's specific data as object
      *
      * @return object
      */
@@ -180,13 +231,20 @@ class StripePay
       }
     }
 
+    /**
+     * Charge refund with charge id.
+     * Store charge id in database when create charge.
+     *
+     * @param string $chargeID
+     * @return string.
+     */
     public function refund($chargeID)
     {
         try {
             Refund::create([
                 'charge' => $chargeID,
             ]);
-            return ['refund'=>'true'];
+            return 'refund';
         } catch (\Exception $e) {
             $error = [
                 'status' => 'error',

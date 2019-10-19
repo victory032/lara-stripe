@@ -13,7 +13,7 @@ use Stripe\Charge;
 use Stripe\Checkout\Session;
 use Config;
 
-class StripePaySession
+class StripeCheckout
 {
     private $currency = 'usd';
     private $description = 'Stripe payment checkout by lara-stripe';
