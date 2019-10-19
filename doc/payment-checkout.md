@@ -10,7 +10,7 @@ LaraStripe has payment checkout (session) alias `LaraStripeSession`.
 
 ```php
 LaraStripeSession::setup([
-    'secret' => '********',
+    'secret_key' => '********',
     'public_key' => '****',
     'currency' => 'usd'
 ])
@@ -20,13 +20,13 @@ LaraStripeSession::setup([
 
 `configure` method has `success_url,cancel_url,ref_id`.
 
-* `ref_id` can be a `customer ID`, a `cart ID`, or `similar`, and can be used to `reconcile` the session with your internal systems.
+* `ref_key` can be a `customer ID`, a `cart ID`, or `similar`, and can be used to `reconcile` the session with your internal systems.
 
 ```php
 LaraStripeSession::configure([
     'success_url' => 'http://test.co/success?session_id={CHECKOUT_SESSION_ID}',
     'cancel_url' => 'http://test.co'
-    'ref_id' => 'tnx_4345623232'
+    'ref_key' => 'tnx_4345623232'
 ])
 ```
 
@@ -59,13 +59,13 @@ LaraStripeSession::products([
 
 ## getSession
 
-getSession method return session id as like `cs_test_k8ep1Z7ndlRmAgl0JU0m7SciO8QjSpoFjAIDheeCtCflp4gRdBShozOs` and public key as `pk_test_VNi7F1zcwwffZIi1tAkX1dVs00JfKPsCGR`.
+getSession method return session id (`sid`) and public key (`pkey`) .  session id as like `cs_test_k8ep1Z7ndlRmAgl0JU0m7SciO8QjSpoFjAIDheeCtCflp4gRdBShozOs` and public key as `pk_test_VNi7F1zcwwffZIi1tAkX1dVs00JfKPsCGR`.
 
+* `type object`
 * pass this data  with view
 
 ```php
 LaraStripeSession::getSession()
-// output ['sid'=> '****','pkey'=> '*****']
 ```
 
 ## full code LaraStripeSession
@@ -130,12 +130,12 @@ stripe.redirectToCheckout({
 * include `<script src="https://js.stripe.com/v3/"></script>`
 
 ```js
-var publicKey = '{{ $session['pkey'] }}'
-var SessionID = '{{ $session['sid'] }}'
+var publicKey = '{{ $session->pkey }}'
+var SessionId = '{{ $session->sid }}'
 var stripe = Stripe(publicKey);
 
 stripe.redirectToCheckout({
-  sessionId: SessionID
+  sessionId: SessionId
 }).then(function (result) {
 
 });

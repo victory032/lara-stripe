@@ -22,7 +22,7 @@ class StripePaySession
     private $publicKey;
     private $successURI;
     private $cancelURI;
-    private $referenceID;
+    private $referenceKey;
 
     public function __construct()
     {
@@ -35,7 +35,7 @@ class StripePaySession
 
     public function setup($data)
     {
-        $this->secretKey = $data['secret'];
+        $this->secretKey = $data['secret_key'];
         $this->publicKey = $data['public_key'];
         $this->currency = strtolower($data['currency']);
         return $this;
@@ -45,7 +45,7 @@ class StripePaySession
     {
         $this->successURI = $data['success_url'];
         $this->cancelURI = $data['cancel_url'];
-        $this->referenceID = $data['ref_id'];
+        $this->referenceKey = $data['ref_key'];
         return $this;
     }
 
@@ -80,13 +80,14 @@ class StripePaySession
               'line_items' => $this->products,
               'success_url' => $this->successURI,
               'cancel_url' => $this->cancelURI,
-              'client_reference_id' => $this->referenceID,
+              'client_reference_id' => $this->referenceKey,
 
             ]);
-            return [
-                    'sid' => $session->id,
-                    'pkey' => $this->publicKey
-                 ];
+            $output =  [
+                'sid' => $session->id,
+                'pkey' => $this->publicKey
+            ];
+            return (object) $output;
         }
     }
 
