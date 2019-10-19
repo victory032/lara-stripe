@@ -39,7 +39,7 @@ LaraStripe::amount(121.50);
 metadata methods array parameter you can declare here your `product id`, `customer id` or `similiar` datas.
 
 ```php
-LaraStripe::metaData(['product_id'=>'p-121','purchase_id' => 'pur-12321']);
+LaraStripe::metadata(['product_id'=>'p-121','purchase_id' => 'pur-12321']);
 ```
 
 ## description()
@@ -104,7 +104,7 @@ $charge = LaraStripe::setup([
     "description": "LaraStripe Laravel Stripe payment",
     "paid": true,
     "status": "succeeded",
-    "meta_data": {
+    "metadata": {
         "product_id": "p-121",
         "purchase_id": "pur-12321"
     },
