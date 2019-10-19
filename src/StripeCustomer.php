@@ -7,6 +7,9 @@ namespace Code4mk\LaraStripe;
  * @copyright 0dev.co (https://0dev.co)
  */
 
+// https://stripe.com/docs/saving-cards
+// https://stripe.com/docs/api/customers/list
+//
 use Stripe\Stripe;
 use Stripe\Customer;
 
@@ -86,6 +89,14 @@ class StripeCustomer
     {
         Stripe::setApiKey($this->secretKey);
         return Customer::all();
+    }
+
+    public function changeCard($cusId,$cardToken)
+    {
+        Stripe::setApiKey($this->secretKey);
+        Customer::update($cusId,[
+            'source' => $cardToken
+        ]);
     }
 
 
