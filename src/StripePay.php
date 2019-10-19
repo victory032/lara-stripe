@@ -16,14 +16,17 @@ class StripePay
 {
     private $card = [];
     private $token = '';
-    private $metaData = [];
+    private $metadata = [];
     private $currency = 'usd';
     private $description = 'Stripe charge by lara-stripe';
     private $amount;
     private $secretKey;
     private $publicKey;
-    private $output;
+
+    /* $allOutput object */
     private $allOutput;
+
+    /* $error object */
     private $error;
 
     public function __construct()
@@ -37,7 +40,7 @@ class StripePay
 
     public function setup($data)
     {
-        $this->secretKey = $data['secret'];
+        $this->secretKey = $data['secret_key'];
         $this->publicKey = $data['public_key'];
         $this->currency = strtolower($data['currency']);
         return $this;
@@ -68,9 +71,9 @@ class StripePay
         return $this;
     }
 
-    public function metaData($data)
+    public function metadata($data)
     {
-        $this->metaData = $data;
+        $this->metadata = $data;
         return $this;
     }
 
@@ -108,7 +111,7 @@ class StripePay
                 'amount' => $this->amount,
                 'currency' => $this->currency,
                 'source' => $this->token,
-                'metadata' => $this->metaData,
+                'metadata' => $this->metadata,
                 'description' => $this->description
             ]);
             $this->allOutput = $charge;
@@ -134,6 +137,12 @@ class StripePay
             return $this->allOutput;
         }
     }
+
+    /**
+     * Return charge specific datas as object
+     *
+     * @return object
+     */
     public function get()
     {
         if($this->error){
@@ -145,15 +154,18 @@ class StripePay
             ];
         }
         if ($this->allOutput !== '') {
-            $this->output['amount'] = $this->allOutput['amount'] / 100;
-            $this->output['currency'] = $this->allOutput['currency'];
-            $this->output['balance_transaction'] = $this->allOutput['balance_transaction'];
-            $this->output['description'] = $this->allOutput['description'];
-            $this->output['paid'] = $this->allOutput['paid'];
-            $this->output['meta_data'] = $this->allOutput['metadata'];
-            $this->output['created'] = $this->allOutput['created'];
+            $output = [
+                'amount' => $this->allOutput->amount / 100,
+                'currency' => $this->allOutput->currency,
+                'balance_transaction' => $this->allOutput->balance_transaction,
+                'description' => $this->allOutput->description,
+                'paid' => $this->allOutput->paid,
+                'status' => $this->allOutput->status,
+                'metadata' => $this->allOutput->metadata,
+                'created' => $this->allOutput->created,
+            ];
 
-            return $this->output;
+            return (object) $output;
       }
     }
 }

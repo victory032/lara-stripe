@@ -34,9 +34,9 @@ amount method parameter take amount.
 LaraStripe::amount(121.50);
 ```
 
-## metaData()
+## metadata()
 
-metaData methods array parameter you can declare here your `product id`, `customer id` or `similiar` datas.
+metadata methods array parameter you can declare here your `product id`, `customer id` or `similiar` datas.
 
 ```php
 LaraStripe::metaData(['product_id'=>'p-121','purchase_id' => 'pur-12321']);
@@ -60,7 +60,7 @@ LaraStripe::purchase();
 
 ## get()
 
-get method return some data.
+get method return some data . `type object`
 
 ```php
 LaraStripe::get();
@@ -68,7 +68,7 @@ LaraStripe::get();
 
 ## getAll()
 
-get method return all datas.
+get method return all datas. `type object`
 
 ```php
 LaraStripe::getAll();
@@ -90,4 +90,31 @@ $charge = LaraStripe::setup([
 ->get()
 // or
 // ->getAll()
+# access response
+// $charge->metadata->product_id
+```
+
+* response
+
+```json
+{
+    "amount": 121.50,
+    "currency": "usd",
+    "balance_transaction": "txn_1FVAcYAHZl11YnL9Ld0Fq3lp",
+    "description": "LaraStripe Laravel Stripe payment",
+    "paid": true,
+    "status": "succeeded",
+    "meta_data": {
+        "product_id": "p-121",
+        "purchase_id": "pur-12321"
+    },
+    "created": 1571463416
+}
+```
+
+* access response
+
+```php
+# php file
+$charge->metadata->product_id
 ```
