@@ -12,6 +12,8 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Foundation\AliasLoader;
 use Code4mk\LaraStripe\StripePay;
 use Code4mk\LaraStripe\StripePaySession;
+use Code4mk\LaraStripe\StripeBalance;
+use Code4mk\LaraStripe\StripeCustomer;
 
 class LaraStripeServiceProvider extends ServiceProvider
 {
@@ -31,6 +33,8 @@ class LaraStripeServiceProvider extends ServiceProvider
 
       AliasLoader::getInstance()->alias('LaraStripe', 'Code4mk\LaraStripe\Facades\LStripe');
       AliasLoader::getInstance()->alias('LaraStripeSession', 'Code4mk\LaraStripe\Facades\LStripeSession');
+      AliasLoader::getInstance()->alias('LaraStripeBalance', 'Code4mk\LaraStripe\Facades\LStripeBalance');
+      AliasLoader::getInstance()->alias('LaraStripeCustomer', 'Code4mk\LaraStripe\Facades\LStripeCustomer');
    }
 
   /**
@@ -41,11 +45,20 @@ class LaraStripeServiceProvider extends ServiceProvider
    public function register()
    {
      $this->app->bind('laraStripe', function () {
-      return new StripePay;
+         return new StripePay;
      });
 
      $this->app->bind('laraStripeSession', function () {
-      return new StripePaySession;
+         return new StripePaySession;
      });
+
+     $this->app->bind('laraStripeBalance', function () {
+         return new StripeBalance;
+     });
+
+     $this->app->bind('laraStripeCustomer', function () {
+         return new StripeCustomer;
+     });
+
    }
 }

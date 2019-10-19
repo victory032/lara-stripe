@@ -22,6 +22,7 @@ class StripePay
     private $amount;
     private $secretKey;
     private $publicKey;
+    private $payOption;
 
     /* $allOutput object */
     private $allOutput;
@@ -61,6 +62,16 @@ class StripePay
         } else {
             $this->token = $data;
         }
+
+        $this->payOption = 'source';
+
+        return $this;
+    }
+
+    public function customer($data)
+    {
+        $this->token = $data;
+        $this->payOption = 'customer';
 
         return $this;
     }
@@ -106,11 +117,10 @@ class StripePay
         }
 
         try {
-
             $charge = Charge::create([
                 'amount' => $this->amount,
                 'currency' => $this->currency,
-                'source' => $this->token,
+                $this->payOption => $this->token,
                 'metadata' => $this->metadata,
                 'description' => $this->description
             ]);
