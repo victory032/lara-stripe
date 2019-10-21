@@ -153,7 +153,9 @@ class StripeCharge
         try {
             Stripe::setApiKey($this->secretKey);
         } catch (\Exception $e) {
-            $this->error = $e;
+            foreach ((array)$e as $key => $value) {
+                $this->error[substr($key, 3)] = $value;
+            }
             return $this;
         }
 
@@ -165,7 +167,9 @@ class StripeCharge
                 $this->token = $createToken->id;
                 // return $this->token;
             } catch (\Exception $e) {
-                $this->error = $e;
+                foreach ((array)$e as $key => $value) {
+                    $this->error[substr($key, 3)] = $value;
+                }
                 return $this;
             }
         }
@@ -181,7 +185,9 @@ class StripeCharge
             $this->allOutput = $charge;
             return $this;
         } catch (\Exception $e) {
-            $this->error = $e;
+            foreach ((array)$e as $key => $value) {
+                $this->error[substr($key, 3)] = $value;
+            }
             return $this;
         }
     }
@@ -194,7 +200,7 @@ class StripeCharge
     public function getAll()
     {
         if($this->error){
-            return (object) ['isError' => 'true','stripeError'=>$this->error];
+            return  (object)['isError' => 'true','stripeError'=>$this->error];
         }
 
         if ($this->allOutput !== '') {
@@ -243,8 +249,10 @@ class StripeCharge
                 'charge' => $chargeID,
             ]);
             return 'refund';
-        } catch (\Stripe\Error\Base $e) {
-            $this->error = $e;
+        } catch (\Exception $e) {
+            foreach ((array)$e as $key => $value) {
+                $this->error[substr($key, 3)] = $value;
+            }
             return (object)['isError' => 'true','stripeError'=>$this->error];
         }
 
