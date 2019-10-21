@@ -2,7 +2,7 @@
 Laravel Stripe payment
 
 
-# charge
+# charge .
 
 ```php
 Route::get('pay',function(){
