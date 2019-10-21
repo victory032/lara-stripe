@@ -194,7 +194,7 @@ class StripeCharge
     public function getAll()
     {
         if($this->error){
-            return $this->error;
+            return (object) ['isError' => 'true','stripeError'=>$this->error];
         }
 
         if ($this->allOutput !== '') {
@@ -210,7 +210,7 @@ class StripeCharge
     public function get()
     {
         if($this->error){
-            return $this->error;
+            return (object) ['isError' => 'true','stripeError'=>$this->error];
         }
         if ($this->allOutput !== '') {
             $output = [
@@ -244,7 +244,7 @@ class StripeCharge
             return 'refund';
         } catch (\Exception $e) {
             $this->error = $e;
-            return $this->error;
+            return (object) ['isError' => 'true','stripeError'=>$this->error];
         }
 
     }
