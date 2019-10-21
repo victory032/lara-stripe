@@ -27,6 +27,9 @@
       "Code4mk\\LaraStripe\\": "src/"
     }
   },
+  "require": {
+      "stripe/stripe-php": "^7.5"
+  },
   "extra": {
     "laravel": {
         "providers": [
