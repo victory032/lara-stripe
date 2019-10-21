@@ -110,21 +110,25 @@ class StripeCheckout
             }
         }
 
-        Stripe::setApiKey($this->secretKey);
-        if (is_array($this->products) && sizeof($this->products) > 0) {
-            $session = Session::create([
-              'payment_method_types' => ['card'],
-              'line_items' => $this->products,
-              'success_url' => $this->successURI,
-              'cancel_url' => $this->cancelURI,
-              'client_reference_id' => $this->referenceKey,
+        try {
+            Stripe::setApiKey($this->secretKey);
+            if (is_array($this->products) && sizeof($this->products) > 0) {
+                $session = Session::create([
+                  'payment_method_types' => ['card'],
+                  'line_items' => $this->products,
+                  'success_url' => $this->successURI,
+                  'cancel_url' => $this->cancelURI,
+                  'client_reference_id' => $this->referenceKey,
 
-            ]);
-            $output =  [
-                'sid' => $session->id,
-                'pkey' => $this->publicKey
-            ];
-            return (object) $output;
+                ]);
+                $output =  [
+                    'sid' => $session->id,
+                    'pkey' => $this->publicKey
+                ];
+                return (object) $output;
+            }
+        } catch (\Exception $e) {
+            return (object)['isError' => 'true','message'=> $e->getMessage()];
         }
     }
 
@@ -136,8 +140,14 @@ class StripeCheckout
      */
     public function retrieve($sessionToken)
     {
-        Stripe::setApiKey($this->secretKey);
-        $infos = Session::retrieve($sessionToken);
-        return $infos;
+        try {
+            Stripe::setApiKey($this->secretKey);
+            $infos = Session::retrieve($sessionToken);
+            return $infos;
+        } catch (\Exception $e) {
+            return (object)['isError' => 'true','message'=> $e->getMessage()];
+        }
+
+
     }
 }
