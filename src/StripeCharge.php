@@ -48,9 +48,16 @@ class StripeCharge
      */
     public function setup($data)
     {
-        $this->secretKey = $data['secret_key'];
-        $this->publicKey = $data['public_key'];
-        $this->currency = strtolower($data['currency']);
+        if (isset($data['secret_key'])) {
+            $this->secretKey = $data['secret_key'];
+        }
+        if (isset($data['public_key'])) {
+            $this->publicKey = $data['public_key'];
+        }
+        if (isset($data['currency'])) {
+            $this->currency = strtolower($data['currency']);
+        }
+
         return $this;
     }
 
@@ -187,12 +194,7 @@ class StripeCharge
     public function getAll()
     {
         if($this->error){
-            return [
-                'pay_status' => 'error',
-                'code' => $this->error->jsonBody{'error'}{'code'},
-                'message' => $this->error->jsonBody{'error'}{'message'},
-                // 'error' => $this->error,
-            ];
+            return $this->error;
         }
 
         if ($this->allOutput !== '') {
@@ -208,12 +210,7 @@ class StripeCharge
     public function get()
     {
         if($this->error){
-            return [
-                'pay_status' => 'error',
-                'code' => $this->error->jsonBody{'error'}{'code'},
-                'message' => $this->error->jsonBody{'error'}{'message'},
-                // 'error' => $this->error,
-            ];
+            return $this->error;
         }
         if ($this->allOutput !== '') {
             $output = [
@@ -246,11 +243,8 @@ class StripeCharge
             ]);
             return 'refund';
         } catch (\Exception $e) {
-            $error = [
-                'status' => 'error',
-                'error_msg' => $e->jsonBody{'error'}{'code'},
-            ];
-            return $error;
+            $this->error = $e;
+            return $this->error;
         }
 
     }
