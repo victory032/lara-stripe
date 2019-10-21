@@ -32,28 +32,62 @@ class StripeCheckout
             $this->publicKey = config::get('lara-stripe.public_key');
         }
     }
-
+    /**
+     * Set credentials, secret and public key
+     *
+     * Set stripe currency
+     * @param array $data
+     * @return $this
+     */
     public function setup($data)
     {
-        $this->secretKey = $data['secret_key'];
-        $this->publicKey = $data['public_key'];
-        $this->currency = strtolower($data['currency']);
+        if (isset($data['secret_key'])) {
+            $this->secretKey = $data['secret_key'];
+        }
+        if (isset($data['public_key'])) {
+            $this->publicKey = $data['public_key'];
+        }
+        if (isset($data['currency'])) {
+            $this->currency = strtolower($data['currency']);
+        }
         return $this;
     }
-
+    /**
+     * Configure success url , cancel url &  ref
+     *
+     * @param array $data
+     * @return $this
+     */
     public function configure($data)
     {
-        $this->successURI = $data['success_url'];
-        $this->cancelURI = $data['cancel_url'];
-        $this->referenceKey = $data['ref_key'];
+        if (isset($data['success_url'])) {
+            $this->successURI = $data['success_url'];
+        }
+        if (isset($data['cancel_url'])) {
+            $this->cancelURI = $data['cancel_url'];
+        }
+        if (isset($data['ref_key'])) {
+            $this->referenceKey = $data['ref_key'];
+        }
         return $this;
     }
 
+    /**
+     * Retrieve public key
+     *
+     * @return $this
+     */
     public function publicKey()
     {
         return $this->publicKey;
     }
 
+    /**
+     * Set products
+     *
+     * @param array $data
+     * @return $this
+     */
     public function products($data)
     {
         if (is_array($data) && sizeof($data) > 0) {
@@ -61,10 +95,13 @@ class StripeCheckout
         }
         return $this;
     }
-
+    /**
+     * Get session id and public key
+     *
+     * @return object sid and pkey
+     */
     public function getSession()
     {
-
         for($i=0;$i<sizeof($this->products);$i++){
             $this->products[$i]['currency'] = $this->currency;
             $this->products[$i]['amount'] = round($this->products[$i]['amount'],2) * 100;
@@ -91,6 +128,12 @@ class StripeCheckout
         }
     }
 
+    /**
+     * Retrieve session.
+     *
+     * @param string $sessionToken
+     * @return object $infos
+     */
     public function retrieve($sessionToken)
     {
         Stripe::setApiKey($this->secretKey);
