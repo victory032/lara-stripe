@@ -39,66 +39,101 @@ class StripeCustomer
             $this->publicKey = config::get('lara-stripe.public_key');
         }
     }
-
+    /**
+     * Set credentials, secret  key
+     *
+     * @param array $data
+     * @return $this
+     */
     public function setup($data)
     {
-        $this->secretKey = $data['secret_key'];
-        $this->publicKey = $data['public_key'];
-        $this->currency = strtolower($data['currency']);
+        if (isset($data['secret_key'])) {
+            $this->secretKey = $data['secret_key'];
+        }
         return $this;
     }
 
-
+    /**
+     * Customer data
+     *
+     * @param  array $datas customer data
+     * @return $this
+     */
     public function create($datas)
     {
-        foreach ($datas as $key => $data) {
-            $this->createCustomerData[$key] = $data;
-        }
-
-        if (!isset($this->createCustomerData['metadata'])) {
-            $this->createCustomerData['metadata'] = $this->metadata;
+        if (is_array($datas)) {
+            foreach ($datas as $key => $data) {
+                $this->createCustomerData[$key] = $data;
+            }
         }
         return $this;
     }
-
+    /**
+     * Set customer metadata
+     *
+     * @param  array $data customer metadata
+     * @return $this
+     */
     public function metadata($data)
     {
         $this->metadata = $data;
         return $this;
     }
 
+    /**
+     * create customer and retrieve customer id
+     * @return string
+     */
     public function get()
     {
-        Stripe::setApiKey($this->secretKey);
-        $this->customer = Customer::create($this->createCustomerData);
-        return $this->customer;
-    }
 
-    public function retrieve($id)
-    {
-        try{
+        // if (!isset($this->createCustomerData['metadata'])) {
+        //     $this->createCustomerData['metadata'] = $this->metadata;
+        // }
+
+        try {
             Stripe::setApiKey($this->secretKey);
-            return Customer::retrieve($id);
+            $this->customer = Customer::create($this->createCustomerData);
+            return $this->customer;
         } catch (\Exception $e) {
-
+            return (object) ['isError' => 'true', 'message'=> $e->getMessage()];
         }
 
     }
 
-    public function lists()
+    /**
+     * retrieve customer with $id
+     * @param  string $id customer id
+     * @return [type]     [description]
+     */
+    public function retrieve($id)
     {
-        Stripe::setApiKey($this->secretKey);
-        return Customer::all();
+        try{
+            Stripe::setApiKey($this->secretKey);
+            $cus = Customer::retrieve($id);
+            return $cus;
+        } catch (\Exception $e) {
+            return (object) ['isError' => 'true', 'message'=> $e->getMessage()];
+        }
+
     }
 
+    /**
+     * Change customer credit card
+     * @param  string $cusId     customer id
+     * @param  string $cardToken card token
+     * @return string|object
+     */
     public function changeCard($cusId,$cardToken)
     {
-        Stripe::setApiKey($this->secretKey);
-        Customer::update($cusId,[
-            'source' => $cardToken
-        ]);
+        try {
+            Stripe::setApiKey($this->secretKey);
+            Customer::update($cusId,[
+                'source' => $cardToken
+            ]);
+            return 'Customer card changed successfuly';
+        } catch (\Exception $e) {
+            return (object) ['isError' => 'true', 'message'=> $e->getMessage()];
+        }
     }
-
-
-
 }
