@@ -153,9 +153,7 @@ class StripeCharge
         try {
             Stripe::setApiKey($this->secretKey);
         } catch (\Exception $e) {
-            foreach ((array)$e as $key => $value) {
-                $this->error[substr($key, 3)] = $value;
-            }
+            $this->error = $e;
             return $this;
         }
 
@@ -167,9 +165,7 @@ class StripeCharge
                 $this->token = $createToken->id;
                 // return $this->token;
             } catch (\Exception $e) {
-                foreach ((array)$e as $key => $value) {
-                    $this->error[substr($key, 3)] = $value;
-                }
+                $this->error = $e;
                 return $this;
             }
         }
@@ -185,9 +181,7 @@ class StripeCharge
             $this->allOutput = $charge;
             return $this;
         } catch (\Exception $e) {
-            foreach ((array)$e as $key => $value) {
-                $this->error[substr($key, 3)] = $value;
-            }
+            $this->error = $e;
             return $this;
         }
     }
@@ -200,7 +194,7 @@ class StripeCharge
     public function getAll()
     {
         if($this->error){
-            return  (object)['isError' => 'true','stripeError'=>$this->error];
+            return (object)['isError' => 'true','message'=> $this->error->getMessage()];
         }
 
         if ($this->allOutput !== '') {
@@ -216,7 +210,7 @@ class StripeCharge
     public function get()
     {
         if($this->error){
-            return  (object)['isError' => 'true','stripeError'=>$this->error];
+            return (object)['isError' => 'true','message'=> $this->error->getMessage()];
         }
         if ($this->allOutput !== '') {
             $output = [
@@ -250,10 +244,7 @@ class StripeCharge
             ]);
             return 'refund';
         } catch (\Exception $e) {
-            foreach ((array)$e as $key => $value) {
-                $this->error[substr($key, 3)] = $value;
-            }
-            return (object)['isError' => 'true','stripeError'=>$this->error];
+            return (object)['isError' => 'true','message'=> $e->getMessage()];
         }
 
     }
