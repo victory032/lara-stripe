@@ -210,7 +210,7 @@ class StripeCharge
     public function get()
     {
         if($this->error){
-            return (object) ['isError' => 'true','stripeError'=>$this->error];
+            return  (object)['isError' => 'true','stripeError'=>$this->error];
         }
         if ($this->allOutput !== '') {
             $output = [
@@ -238,13 +238,14 @@ class StripeCharge
     public function refund($chargeID)
     {
         try {
+            Stripe::setApiKey($this->secretKey);
             Refund::create([
                 'charge' => $chargeID,
             ]);
             return 'refund';
-        } catch (\Exception $e) {
+        } catch (\Stripe\Error\Base $e) {
             $this->error = $e;
-            return (object) ['isError' => 'true','stripeError'=>$this->error];
+            return (object)['isError' => 'true','stripeError'=>$this->error];
         }
 
     }
