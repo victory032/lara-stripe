@@ -156,8 +156,7 @@ class StripeCheckout
                   'line_items' => $this->products,
                   'success_url' => $this->successURI,
                   'cancel_url' => $this->cancelURI,
-                  'client_reference_id' => $this->referenceKey,
-
+                  'client_reference_id' => $this->referenceKey
                 ]);
                 $output =  [
                     'sid' => $session->id,
