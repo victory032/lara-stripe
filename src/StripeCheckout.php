@@ -9,6 +9,7 @@ namespace Code4mk\LaraStripe;
 
 use Stripe\Checkout\Session;
 use Stripe\Stripe;
+use Stripe\Refund;
 use Config;
 
 class StripeCheckout
@@ -181,6 +182,26 @@ class StripeCheckout
             Stripe::setApiKey($this->secretKey);
             $infos = Session::retrieve($sessionToken);
             return $infos;
+        } catch (\Exception $e) {
+            return (object)['isError' => 'true','message'=> $e->getMessage()];
+        }
+    }
+
+    /**
+     * Checkout refund
+     * Store payment_intent when checkout success in DB.
+     * @param  string $payment_intent get from database
+     * @return object
+     */
+    public function refund($payment_intent)
+    {
+        try {
+            Stripe::setApiKey($this->secretKey);
+            $intent = \Stripe\PaymentIntent::retrieve($payment_intent);
+            $re = \Stripe\Refund::create([
+              'charge' => $intent->charges->data[0]->id
+            ]);
+            return $re;
         } catch (\Exception $e) {
             return (object)['isError' => 'true','message'=> $e->getMessage()];
         }

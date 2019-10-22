@@ -160,6 +160,16 @@ Route::get('success',function(Request $request){
 })
 ```
 
+# refund
+
+* Store payment_intent in db when checkout success. ('retrieve method')  
+
+```php
+$re = LaraStripeCheckout::setup(['secret' => '******'])
+                    ->refund('payment_intent')
+return response()->json($re);
+```
+
 # reference
 
 * [session stripe](https://stripe.com/docs/api/checkout/sessions/object#checkout_session_object-id)
