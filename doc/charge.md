@@ -1,7 +1,7 @@
 
 # Stripe charge
 
-LaraStripe has charge alias `LaraStripe`.
+LaraStripeCharge has charge alias `LaraStripeCharge`.
 
 
 # Methods
@@ -11,7 +11,7 @@ LaraStripe has charge alias `LaraStripe`.
 setup method has `secret_key,public_key,currency` .
 
 ```php
-LaraStripe::setup([
+LaraStripeCharge::setup([
     'secret_key' => '******',
     'public_key' => '******',
     'currency'   => 'usd'
@@ -20,26 +20,37 @@ LaraStripe::setup([
 
 ## card()
 
-card method parameter will be card token which come from stripe js with request.
+card method parameter will be card token which come from stripe.js with request.
 
 ```php
-LaraStripe::card($token);
+LaraStripeCharge::card($token);
+```
+
+or direct card
+
+```php
+LaraStripeCharge::card([
+    'number' => '4242424242424242'
+    'exp_month' => '11',
+    'exp_year' => '22',
+    'cvc' => '222'
+]);
 ```
 
 ## amount()
 
-amount method parameter take amount.
+amount method set charge amount
 
 ```php
-LaraStripe::amount(121.50);
+LaraStripeCharge::amount(121.50);
 ```
 
 ## metadata()
 
-metadata methods array parameter you can declare here your `product id`, `customer id` or `similiar` datas.
+metadata methods array parameter you can declare here your `product id`, `customer id` or `similiar` data.
 
 ```php
-LaraStripe::metadata(['product_id'=>'p-121','purchase_id' => 'pur-12321']);
+LaraStripeCharge::metadata(['product_id'=>'p-121','purchase_id' => 'pur-12321']);
 ```
 
 ## description()
@@ -47,7 +58,7 @@ LaraStripe::metadata(['product_id'=>'p-121','purchase_id' => 'pur-12321']);
 description method declare products/charge details.
 
 ```php
-LaraStripe::description('LaraStripe Laravel Stripe payment');
+LaraStripeCharge::description('LaraStripeCharge Laravel Stripe payment');
 ```
 
 ## purchase()
@@ -55,7 +66,7 @@ LaraStripe::description('LaraStripe Laravel Stripe payment');
 purchase method create charge.
 
 ```php
-LaraStripe::purchase();
+LaraStripeCharge::purchase();
 ```
 
 ## get()
@@ -63,7 +74,7 @@ LaraStripe::purchase();
 get method return some data . `type object`
 
 ```php
-LaraStripe::get();
+LaraStripeCharge::get();
 ```
 
 ## getAll()
@@ -71,13 +82,13 @@ LaraStripe::get();
 get method return all datas. `type object`
 
 ```php
-LaraStripe::getAll();
+LaraStripeCharge::getAll();
 ```
 
 # Full code
 
 ```php
-$charge = LaraStripe::setup([
+$charge = LaraStripeCharge::setup([
     'secret_key' => '******',
     'public_key' => '******',
     'currency'   => 'usd'
@@ -85,7 +96,7 @@ $charge = LaraStripe::setup([
 ->card($token)
 ->amount(121.50)
 ->metaData(['product_id'=>'p-121','purchase_id' => 'pur-12321'])
-->description('LaraStripe Laravel Stripe payment')
+->description('LaraStripeCharge Laravel Stripe payment')
 ->purchase()
 ->get()
 // or
@@ -98,10 +109,11 @@ $charge = LaraStripe::setup([
 
 ```json
 {
+    "charge_id": "ch_1FWHbuAHZl11YnL9fU2BALTS",
     "amount": 121.50,
     "currency": "usd",
     "balance_transaction": "txn_1FVAcYAHZl11YnL9Ld0Fq3lp",
-    "description": "LaraStripe Laravel Stripe payment",
+    "description": "LaraStripeCharge Laravel Stripe payment",
     "paid": true,
     "status": "succeeded",
     "metadata": {

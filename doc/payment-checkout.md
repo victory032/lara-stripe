@@ -1,6 +1,6 @@
 # Payment Checkout
 
-LaraStripe has payment checkout (session) alias `LaraStripeSession`.
+LaraStripe has payment checkout (session) alias `LaraStripeCheckout`.
 
 # Methods
 
@@ -9,7 +9,7 @@ LaraStripe has payment checkout (session) alias `LaraStripeSession`.
 `setup` method has `secret,public_key,currency` properties as `array`.
 
 ```php
-LaraStripeSession::setup([
+LaraStripeCheckout::setup([
     'secret_key' => '********',
     'public_key' => '****',
     'currency' => 'usd'
@@ -23,7 +23,7 @@ LaraStripeSession::setup([
 * `ref_key` can be a `customer ID`, a `cart ID`, or `similar`, and can be used to `reconcile` the session with your internal systems.
 
 ```php
-LaraStripeSession::configure([
+LaraStripeCheckout::configure([
     'success_url' => 'http://test.co/success?session_id={CHECKOUT_SESSION_ID}',
     'cancel_url' => 'http://test.co'
     'ref_key' => 'tnx_4345623232'
@@ -42,11 +42,11 @@ LaraStripeSession::configure([
 
 
 ```php
-LaraStripeSession::products([
+LaraStripeCheckout::products([
     [
         'name' => 'T-shirt',
         'description' => 'Banladeshi T-shirt model 23',
-        'image' => ['https://cdn.pixabay.com/photo/2016/12/06/09/31/blank-1886008_960_720.png'],
+        'images' => ['https://cdn.pixabay.com/photo/2016/12/06/09/31/blank-1886008_960_720.png'],
         'amount' => 20.50,
         'quantity' => 2
     ],
@@ -65,15 +65,15 @@ getSession method return session id (`sid`) and public key (`pkey`) .  session i
 * pass this data  with view
 
 ```php
-LaraStripeSession::getSession()
+LaraStripeCheckout::getSession()
 ```
 
-## full code LaraStripeSession
+## full code LaraStripeCheckout
 
 * session_id genereate
 
 ```php
-$session = LaraStripeSession::setup([
+$session = LaraStripeCheckout::setup([
     'secret' => '********',
     'public_key' => '****',
     'currency' => 'usd'
@@ -87,7 +87,7 @@ $session = LaraStripeSession::setup([
     [
         'name' => 'T-shirt',
         'description' => 'Banladeshi T-shirt model 23',
-        'image' => ['https://cdn.pixabay.com/photo/2016/12/06/09/31/blank-1886008_960_720.png'],
+        'images' => ['https://cdn.pixabay.com/photo/2016/12/06/09/31/blank-1886008_960_720.png'],
         'amount' => 20.50,
         'quantity' => 2
     ],
@@ -149,7 +149,7 @@ After success payment stripe redirect to success_url . retrive session data in s
 
 ```php
 Route::get('success',function(Request $request){
-    $data = LaraStripeSession::setup([
+    $data = LaraStripeCheckout::setup([
         'secret' => '******',
         'public_key' => '******',
         'currency' => 'usd'
