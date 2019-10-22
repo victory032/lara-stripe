@@ -174,3 +174,4 @@ return response()->json($re);
 
 * [session stripe](https://stripe.com/docs/api/checkout/sessions/object#checkout_session_object-id)
 * [stripe official doc](https://stripe.com/payments/checkout)
+* [stripe payment](https://stripe.com/docs/terminal/payments)

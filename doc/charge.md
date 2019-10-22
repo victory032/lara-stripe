@@ -130,3 +130,15 @@ $charge = LaraStripeCharge::setup([
 # php file
 $charge->metadata->product_id
 ```
+
+# refund
+
+* store charge id  when charge complete.
+
+```php 
+$refund = LaraStripeCharge::setup([
+                    'secret_key'=>'sk_test_mBGoFuccDy2KCD4pobbaixKK00qUW0ghu1',
+                  ])
+                  ->refund('charge id');
+return response()->json($refund);
+```
