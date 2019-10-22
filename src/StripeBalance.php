@@ -11,45 +11,47 @@ use Stripe\Stripe;
 use Stripe\Token;
 use Stripe\Charge;
 use Stripe\Balance;
-
 use Config;
 
 class StripeBalance
 {
-
-    private $currency = 'usd';
+    /**
+     * secret key
+     * @var string
+     */
     private $secretKey;
-    private $publicKey;
-
-    /* $allOutput object */
-    private $allOutput;
-
-    /* $error object */
-    private $error;
 
     public function __construct()
     {
         if(config::get('lara-stripe.driver') === 'config') {
-            $this->currency = config::get('lara-stripe.currency');
             $this->secretKey = config::get('lara-stripe.secret_key');
-            $this->publicKey = config::get('lara-stripe.public_key');
         }
     }
 
+    /**
+     * Set secret key
+     * @param  array $data
+     * @return $this
+     */
     public function setup($data)
     {
-        $this->secretKey = $data['secret_key'];
-        $this->publicKey = $data['public_key'];
-        $this->currency = strtolower($data['currency']);
+        if ($data['secret_key']) {
+            $this->secretKey = $data['secret_key'];
+        }
         return $this;
     }
 
+    /**
+     * Get balance
+     * @return object
+     */
     public function get()
     {
-        Stripe::setApiKey($this->secretKey);
-        return Balance::retrieve();
+        try {
+            Stripe::setApiKey($this->secretKey);
+            return Balance::retrieve();
+        } catch (\Exception $e) {
+            return (object)['isError' => 'true','message'=> $e->getMessage()];
+        }
     }
-
-
-
 }

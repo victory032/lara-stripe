@@ -8,27 +8,77 @@ namespace Code4mk\LaraStripe;
  */
 
 use Stripe\Stripe;
-use Stripe\Token;
 use Stripe\Charge;
 use Stripe\Refund;
+use Stripe\Token;
 use Config;
 
 class StripeCharge
 {
+    /**
+     * card info num , exp date , exp year , cvc
+     * @var array
+     */
     private $card = [];
+
+    /**
+     * source token (card)
+     * @var [type]
+     */
     private $token = '';
+
+    /**
+     * Charge metadata
+     * @var array
+     */
     private $metadata = [];
+
+    /**
+     * Currency
+     * @var string length 3 and lowercase
+     */
     private $currency = 'usd';
+
+    /**
+     * Charge description
+     * @var string
+     */
     private $description = 'Stripe charge by lara-stripe';
+
+    /**
+     * Charge amount
+     * @var int|float
+     */
     private $amount;
+
+    /**
+     * Secret key
+     * @var string
+     */
     private $secretKey;
+
+    /**
+     * Public key
+     * @var string
+     */
     private $publicKey;
+
+    /**
+     * Payoption card or customer
+     * @var string
+     */
     private $payOption;
 
-    /* $allOutput object */
+    /**
+     * Charge all data
+     * @var object
+     */
     private $allOutput;
 
-    /* $error object */
+    /**
+     * Exception error
+     * @var object
+     */
     private $error;
 
     public function __construct()
@@ -214,6 +264,7 @@ class StripeCharge
         }
         if ($this->allOutput !== '') {
             $output = [
+                'charge_id' => $this->allOutput->id,
                 'amount' => $this->allOutput->amount / 100,
                 'currency' => $this->allOutput->currency,
                 'balance_transaction' => $this->allOutput->balance_transaction,

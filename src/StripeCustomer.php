@@ -9,96 +9,136 @@ namespace Code4mk\LaraStripe;
 
 // https://stripe.com/docs/saving-cards
 // https://stripe.com/docs/api/customers/list
-//
-use Stripe\Stripe;
-use Stripe\Customer;
 
+
+use Stripe\Customer;
+use Stripe\Stripe;
 use Config;
 
 class StripeCustomer
 {
-
-    private $currency = 'usd';
+    /**
+     * Secret key
+     * @var string
+     */
     private $secretKey;
-    private $publicKey;
+
+    /**
+     * Customer all data after create
+     * @var object
+     */
     private $customer;
+
+    /**
+     * Customer metadata
+     * @var array
+     */
     private $metadata = [];
+
+    /**
+     * Customer  all data
+     * @var array
+     */
     private $createCustomerData = [];
-
-    /* $allOutput object */
-    private $allOutput;
-
-    /* $error object */
-    private $error;
 
     public function __construct()
     {
         if(config::get('lara-stripe.driver') === 'config') {
-            $this->currency = config::get('lara-stripe.currency');
             $this->secretKey = config::get('lara-stripe.secret_key');
-            $this->publicKey = config::get('lara-stripe.public_key');
         }
     }
-
+    /**
+     * Set secret key
+     * @param  string $data
+     * @return $this
+     */
     public function setup($data)
     {
-        $this->secretKey = $data['secret_key'];
-        $this->publicKey = $data['public_key'];
-        $this->currency = strtolower($data['currency']);
+        if (isset($data['secret_key'])) {
+            $this->secretKey = $data['secret_key'];
+        }
         return $this;
     }
 
 
+    /**
+     * set customer source (card) , email
+     * https://stripe.com/docs/api/customers/create
+     *
+     * @param  array $datas
+     * @return $this
+     */
     public function create($datas)
     {
         foreach ($datas as $key => $data) {
             $this->createCustomerData[$key] = $data;
         }
-
-        if (!isset($this->createCustomerData['metadata'])) {
-            $this->createCustomerData['metadata'] = $this->metadata;
-        }
         return $this;
     }
 
+    /**
+     * Set customer metadata
+     * @param  array $data
+     * @return $this
+     */
     public function metadata($data)
     {
         $this->metadata = $data;
         return $this;
     }
 
+    /**
+     * Create customer and return customer data
+     * @return object
+     */
     public function get()
     {
-        Stripe::setApiKey($this->secretKey);
-        $this->customer = Customer::create($this->createCustomerData);
-        return $this->customer;
-    }
+        if (!isset($this->createCustomerData['metadata'])) {
+            $this->createCustomerData['metadata'] = $this->metadata;
+        }
 
-    public function retrieve($id)
-    {
-        try{
+        try {
             Stripe::setApiKey($this->secretKey);
-            return Customer::retrieve($id);
+            $this->customer = Customer::create($this->createCustomerData);
+            return $this->customer;
         } catch (\Exception $e) {
-
+            return (object)['isError' => 'true','message'=> $e->getMessage()];
         }
 
     }
 
-    public function lists()
+    /**
+     * Retrive customer with $cusIdid.
+     * @param  string $cusIdid
+     * @return object
+     */
+    public function retrieve($cusId)
     {
-        Stripe::setApiKey($this->secretKey);
-        return Customer::all();
+        try{
+            Stripe::setApiKey($this->secretKey);
+            return Customer::retrieve($cusId);
+        } catch (\Exception $e) {
+            return (object)['isError' => 'true','message'=> $e->getMessage()];
+        }
+
     }
 
+    /**
+     * Change customer card.
+     * @param  string $cusId     [description]
+     * @param  string $cardToken create with stripe.js or manually create.
+     * @return object
+     */
     public function changeCard($cusId,$cardToken)
     {
-        Stripe::setApiKey($this->secretKey);
-        Customer::update($cusId,[
-            'source' => $cardToken
-        ]);
+        try {
+            Stripe::setApiKey($this->secretKey);
+            $cus = Customer::update($cusId,[
+                'source' => $cardToken
+            ]);
+            return $cus;
+        } catch (\Exception $e) {
+            return (object)['isError' => 'true','message'=> $e->getMessage()];
+        }
     }
-
-
-
 }

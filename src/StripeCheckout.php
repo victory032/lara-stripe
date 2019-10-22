@@ -7,21 +7,58 @@ namespace Code4mk\LaraStripe;
  * @copyright 0dev.co (https://0dev.co)
  */
 
-use Stripe\Stripe;
-use Stripe\Token;
-use Stripe\Charge;
 use Stripe\Checkout\Session;
+use Stripe\Stripe;
 use Config;
 
 class StripeCheckout
 {
+    /**
+     * Checkout Currency
+     * @var string length 3 and lowercase
+     */
     private $currency = 'usd';
+
+    /**
+     * Checkout description
+     * @var string
+     */
     private $description = 'Stripe payment checkout by lara-stripe';
+
+    /**
+     * Checkout products data
+     * @var array
+     */
     private $products = [];
+
+    /**
+     * Secret key
+     * @var string
+     */
     private $secretKey;
+
+    /**
+     * Public key
+     * @var string
+     */
     private $publicKey;
+
+    /**
+     * Checkout success url
+     * @var string
+     */
     private $successURI;
+
+    /**
+     * Checkout cancel url
+     * @var string
+     */
     private $cancelURI;
+
+    /**
+     * Checkout ref ex: product id , payment id, card id similar.
+     * @var string
+     */
     private $referenceKey;
 
     public function __construct()
@@ -133,7 +170,7 @@ class StripeCheckout
     }
 
     /**
-     * Retrieve session.
+     * Retrieve session (checkout).
      *
      * @param string $sessionToken
      * @return object $infos
@@ -147,7 +184,5 @@ class StripeCheckout
         } catch (\Exception $e) {
             return (object)['isError' => 'true','message'=> $e->getMessage()];
         }
-
-
     }
 }
