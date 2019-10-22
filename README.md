@@ -1,3 +1,5 @@
+<p align="center" ><img src="https://user-images.githubusercontent.com/17185462/67279915-d2a58480-f4ed-11e9-868b-3e467b8552a2.png"></p>
+
 # LaraStripe
 Laravel Stripe payment
 
