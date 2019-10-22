@@ -10,6 +10,7 @@ namespace Code4mk\LaraStripe;
 use Stripe\Checkout\Session;
 use Stripe\Stripe;
 use Stripe\Refund;
+use Stripe\Customer;
 use Config;
 
 class StripeCheckout
@@ -61,6 +62,10 @@ class StripeCheckout
      * @var string
      */
     private $referenceKey;
+
+    private $checkoutData = [];
+
+    private $isFuture = false;
 
     public function __construct()
     {
@@ -133,6 +138,12 @@ class StripeCheckout
         }
         return $this;
     }
+
+    public function future()
+    {
+        $this->isFuture = true;
+        return $this;
+    }
     /**
      * Get session id and public key
      *
@@ -150,20 +161,31 @@ class StripeCheckout
 
         try {
             Stripe::setApiKey($this->secretKey);
-            if (is_array($this->products) && sizeof($this->products) > 0) {
-                $session = Session::create([
-                  'payment_method_types' => ['card'],
-                  'line_items' => $this->products,
-                  'success_url' => $this->successURI,
-                  'cancel_url' => $this->cancelURI,
-                  'client_reference_id' => $this->referenceKey
-                ]);
+            $this->checkoutData['payment_method_types'] = ['card'];
+            $this->checkoutData['success_url'] = $this->successURI;
+            $this->checkoutData['cancel_url'] = $this->cancelURI;
+            $this->checkoutData['client_reference_id'] = $this->referenceKey;
+            if (is_array($this->products) && (sizeof($this->products) > 0) && (!$this->isFuture)) {
+                $this->checkoutData['line_items'] = $this->products;
+                $session = Session::create($this->checkoutData);
                 $output =  [
                     'sid' => $session->id,
                     'pkey' => $this->publicKey
                 ];
                 return (object) $output;
             }
+            // https://stripe.com/docs/payments/checkout/collecting
+            if ($this->isFuture) {
+                $this->checkoutData['mode'] = 'setup';
+                $session = Session::create($this->checkoutData);
+                $output =  [
+                    'sid' => $session->id,
+                    'pkey' => $this->publicKey
+                ];
+                return (object) $output;
+            }
+
+
         } catch (\Exception $e) {
             return (object)['isError' => 'true','message'=> $e->getMessage()];
         }
@@ -204,5 +226,22 @@ class StripeCheckout
         } catch (\Exception $e) {
             return (object)['isError' => 'true','message'=> $e->getMessage()];
         }
+    }
+
+    public function storeFuture($session)
+    {
+        try{
+            $dummyCard = 'tok_amex';
+            Stripe::setApiKey($this->secretKey);
+            $sessionData = $this->retrieve($session);
+            $r = \Stripe\SetupIntent::retrieve($sessionData->setup_intent);
+            $customer = Customer::create(['source'=>$dummyCard]);
+            $payment_method = \Stripe\PaymentMethod::retrieve($r->payment_method);
+            $payment_method->attach(['customer' => $customer->id]);
+            return (object) ['customer' => $payment_method->customer,'ref'=>$sessionData->client_reference_id];
+        } catch (\Exception $e) {
+            return (object)['isError' => 'true','message'=> $e->getMessage()];
+        }
+
     }
 }
