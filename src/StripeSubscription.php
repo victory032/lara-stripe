@@ -1,13 +1,21 @@
 <?php
 namespace Code4mk\LaraStripe;
 
-use Stripe\Customer;
-use Stripe\Stripe;
+/**
+ * @author    @code4mk <hiremostafa@gmail.com>
+ * @author    @kawsarsoft <with@kawsarsoft.com>
+ * @copyright Kawsar Soft. (http://kawsarsoft.com)
+ */
+
 use Stripe\Subscription;
+use Stripe\Stripe;
 use Config;
 
-// https://stripe.com/docs/api/subscriptions/create
-
+/**
+ * Subscription class
+ *
+ * @source  https://stripe.com/docs/api/subscriptions/create
+ */
 class StripeSubscription
 {
     /**

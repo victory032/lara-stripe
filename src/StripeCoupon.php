@@ -1,9 +1,11 @@
 <?php
 namespace Code4mk\LaraStripe;
 
-use Stripe\Stripe;
-use Stripe\Coupon;
-use Config;
+/**
+ * @author    @code4mk <hiremostafa@gmail.com>
+ * @author    @kawsarsoft <with@kawsarsoft.com>
+ * @copyright Kawsar Soft. (http://kawsarsoft.com)
+ */
 
 // https://stripe.com/docs/api/coupons
 
