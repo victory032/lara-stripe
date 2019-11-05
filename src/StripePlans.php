@@ -4,6 +4,7 @@ namespace Code4mk\LaraStripe;
 use Stripe\Customer;
 use Stripe\Stripe;
 use Stripe\Plan;
+use Stripe\Product;
 use Config;
 
 // https://stripe.com/docs/api/plans/create
@@ -26,6 +27,10 @@ class StripePlans
     private $amount;
 
     private $product = [];
+
+    private $extra = [];
+
+    private $trial;
 
     public function __construct()
     {
@@ -54,7 +59,7 @@ class StripePlans
 
     public function amount($amount)
     {
-      $this->amount = $amount;
+      $this->amount = round($amount,2) * 100;
       return $this;
     }
 
@@ -70,6 +75,18 @@ class StripePlans
       return $this;
     }
 
+    public function extra ($data)
+    {
+        $this->extra = $data;
+        return $this;
+    }
+
+    public function trial($day)
+    {
+        $this->trial = $day;
+        return $this;
+    }
+
     public function get()
     {
        try {
@@ -78,11 +95,70 @@ class StripePlans
            'amount' => $this->amount,
            'currency' => $this->currency,
            'interval' => $this->interval,
-           'product' => $this->product
+           'product' => $this->product,
+           'trial_period_days' => $this->trial,
+           // $this->extra
          ]);
          return $plan;
        } catch (\Exception $e) {
          return (object)['isError' => 'true','message'=> $e->getMessage()];
        }
+    }
+
+    public function retrieve($id)
+    {
+        try {
+            Stripe::setApiKey($this->secretKey);
+            $plan = Plan::retrieve($id);
+            return $plan;
+        } catch (\Exception $e) {
+            return (object)['isError' => 'true','message'=> $e->getMessage()];
+        }
+    }
+
+    public function delete($id)
+    {
+        try {
+            Stripe::setApiKey($this->secretKey);
+            $plan = Plan::retrieve($id);
+            $product = $plan->product;
+            $plan->delete();
+
+            $getProduct = Product::retrieve($product);
+            $getProduct->delete();
+
+            return $plan;
+        } catch (\Exception $e) {
+            return (object)['isError' => 'true','message'=> $e->getMessage()];
+        }
+    }
+
+    public function active($id)
+    {
+        try {
+            Stripe::setApiKey($this->secretKey);
+            $plan = Plan::update(
+                $id,
+                ['active' => true]
+            );
+
+            return $plan;
+        } catch (\Exception $e) {
+            return (object)['isError' => 'true','message'=> $e->getMessage()];
+        }
+    }
+
+    public function deactive($id)
+    {
+        try {
+            Stripe::setApiKey($this->secretKey);
+            $plan = Plan::update(
+                $id,
+                ['active' => false]
+            );
+            return $plan;
+        } catch (\Exception $e) {
+            return (object)['isError' => 'true','message'=> $e->getMessage()];
+        }
     }
 }

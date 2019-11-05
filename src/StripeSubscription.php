@@ -26,6 +26,11 @@ class StripeSubscription
     private $plan;
 
     private $extra = [];
+    // trail day from plan
+    private $trialPlan = false;
+
+    private $trial;
+    private $coupon;
 
     public function __construct()
     {
@@ -66,10 +71,35 @@ class StripeSubscription
       return $this;
     }
 
+    public function trialPlan()
+    {
+        $this->trialPlan = true;
+        return $this;
+    }
+
+    public function trial($day) {
+        $this->trial = $day;
+        return $this;
+    }
+
+    public function coupon($code) {
+        $this->coupon = $code;
+        return $this;
+    }
+
     public function get()
     {
         $this->createSubscriptionData['customer'] = $this->customer;
         $this->createSubscriptionData['items'] = [['plan' => $this->plan]];
+        if ($this->trialPlan) {
+            $this->createSubscriptionData['trial_from_plan'] = true;
+        }
+        if ($this->trial) {
+            $this->createSubscriptionData['trial_period_days'] = $this->trial;
+        }
+        if ($this->coupon) {
+            $this->createSubscriptionData['coupon'] = $this->coupon;
+        }
         $subsData = array_merge($this->createSubscriptionData,$this->extra);
 
        try {
@@ -79,5 +109,28 @@ class StripeSubscription
        } catch (\Exception $e) {
          return (object)['isError' => 'true','message'=> $e->getMessage()];
        }
+    }
+
+    public function retrieve($id)
+    {
+        try {
+          Stripe::setApiKey($this->secretKey);
+          $subs = Subscription::retrieve($id);
+          return $subs;
+        } catch (\Exception $e) {
+          return (object)['isError' => 'true','message'=> $e->getMessage()];
+        }
+    }
+
+    public function cancel($id)
+    {
+        try {
+          Stripe::setApiKey($this->secretKey);
+          $subs = Subscription::retrieve($id);
+          $subs->cancel();
+          return $subs;
+        } catch (\Exception $e) {
+          return (object)['isError' => 'true','message'=> $e->getMessage()];
+        }
     }
 }
