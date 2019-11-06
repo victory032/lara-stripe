@@ -7,32 +7,16 @@ namespace Code4mk\LaraStripe;
  * @copyright Kawsar Soft. (http://kawsarsoft.com)
  */
 
-use Stripe\Checkout\Session;
-use Stripe\Stripe;
-use Stripe\Refund;
-use Stripe\Customer;
-use Config;
+ use Stripe\Stripe;
+ use Stripe\Coupon;
+ use Config;
 
-class StripeCheckout
+/**
+ * Coupon class
+ * @source https://stripe.com/docs/api/coupons
+ */
+class StripeCoupon
 {
-    /**
-     * Checkout Currency
-     * @var string length 3 and lowercase
-     */
-    private $currency = 'usd';
-
-    /**
-     * Checkout description
-     * @var string
-     */
-    private $description = 'Stripe payment checkout by lara-stripe';
-
-    /**
-     * Checkout products data
-     * @var array
-     */
-    private $products = [];
-
     /**
      * Secret key
      * @var string
@@ -40,46 +24,56 @@ class StripeCheckout
     private $secretKey;
 
     /**
-     * Public key
+     * Currency when coupon amount is fixed
      * @var string
      */
-    private $publicKey;
+    private $currency;
 
     /**
-     * Checkout success url
-     * @var string
+     * Coupon amount
+     * @var integer|float
      */
-    private $successURI;
+    private $amount;
 
     /**
-     * Checkout cancel url
-     * @var string
+     * Coupon amount type
+     * @var string per or fixed
      */
-    private $cancelURI;
+    private $type;
 
     /**
-     * Checkout ref ex: product id , payment id, card id similar.
-     * @var string
+     * Coupon duration
+     * @var string once
      */
-    private $referenceKey;
+    private $duration;
 
-    private $checkoutData = [];
+    /**
+     * Coupon name & coupon id
+     * @var string must be camel_case
+     */
+    private $name;
 
-    private $isFuture = false;
+    /**
+     * Coupon duration month
+     * @var integer
+     */
+    private $durationMonth;
+
+    /**
+     * All coupon data for create
+     * @var [type]
+     */
+    private $couponData;
 
     public function __construct()
     {
         if(config::get('lara-stripe.driver') === 'config') {
-            $this->currency = config::get('lara-stripe.currency');
             $this->secretKey = config::get('lara-stripe.secret_key');
-            $this->publicKey = config::get('lara-stripe.public_key');
         }
     }
     /**
-     * Set credentials, secret and public key
-     *
-     * Set stripe currency
-     * @param array $data
+     * Set secret key
+     * @param  string $data
      * @return $this
      */
     public function setup($data)
@@ -87,161 +81,79 @@ class StripeCheckout
         if (isset($data['secret_key'])) {
             $this->secretKey = $data['secret_key'];
         }
-        if (isset($data['public_key'])) {
-            $this->publicKey = $data['public_key'];
-        }
-        if (isset($data['currency'])) {
-            $this->currency = strtolower($data['currency']);
-        }
-        return $this;
-    }
-    /**
-     * Configure success url , cancel url &  ref
-     *
-     * @param array $data
-     * @return $this
-     */
-    public function configure($data)
-    {
-        if (isset($data['success_url'])) {
-            $this->successURI = $data['success_url'];
-        }
-        if (isset($data['cancel_url'])) {
-            $this->cancelURI = $data['cancel_url'];
-        }
-        if (isset($data['ref_key'])) {
-            $this->referenceKey = $data['ref_key'];
-        }
         return $this;
     }
 
-    /**
-     * Retrieve public key
-     *
-     * @return $this
-     */
-    public function publicKey()
+    public function amount($amount,$type,$currency = 'usd')
     {
-        return $this->publicKey;
-    }
-
-    /**
-     * Set products
-     *
-     * @param array $data
-     * @return $this
-     */
-    public function products($data)
-    {
-        if (is_array($data) && sizeof($data) > 0) {
-            $this->products = $data;
-        }
-        return $this;
-    }
-
-    public function future()
-    {
-        $this->isFuture = true;
-        return $this;
-    }
-    /**
-     * Get session id and public key
-     *
-     * @return object sid and pkey
-     */
-    public function getSession()
-    {
-        for($i=0;$i<sizeof($this->products);$i++){
-            $this->products[$i]['currency'] = $this->currency;
-            $this->products[$i]['amount'] = round($this->products[$i]['amount'],2) * 100;
-            if (!isset($this->products[$i]['quantity'])) {
-                $this->products[$i]['quantity'] = 1;
-            }
+        if ($type === 'fixed') {
+            $this->amount = round($amount,2) * 100;
+            $this->type = 'fixed';
+            $this->currency = $currency;
+        } else {
+            $this->amount = $amount;
+            $this->type = 'per';
         }
 
-        try {
-            Stripe::setApiKey($this->secretKey);
-            $this->checkoutData['payment_method_types'] = ['card'];
-            $this->checkoutData['success_url'] = $this->successURI;
-            $this->checkoutData['cancel_url'] = $this->cancelURI;
-            $this->checkoutData['client_reference_id'] = $this->referenceKey;
-            if (is_array($this->products) && (sizeof($this->products) > 0) && (!$this->isFuture)) {
-                $this->checkoutData['line_items'] = $this->products;
-                $session = Session::create($this->checkoutData);
-                $output =  [
-                    'sid' => $session->id,
-                    'pkey' => $this->publicKey
-                ];
-                return (object) $output;
-            }
-            // https://stripe.com/docs/payments/checkout/collecting
-            if ($this->isFuture) {
-                $this->checkoutData['mode'] = 'setup';
-                $session = Session::create($this->checkoutData);
-                $output =  [
-                    'sid' => $session->id,
-                    'pkey' => $this->publicKey
-                ];
-                return (object) $output;
-            }
-
-
-        } catch (\Exception $e) {
-            return (object)['isError' => 'true','message'=> $e->getMessage()];
-        }
+      return $this;
     }
 
-    /**
-     * Retrieve session (checkout).
-     *
-     * @param string $sessionToken
-     * @return object $infos
-     */
-    public function retrieve($sessionToken)
+    public function duration($type,$month = 1)
+    {
+        //forever, once, or repeating.
+      if($type === 'repeating') {
+          $this->durationMonth = $month;
+      }
+      $this->duration = $type;
+      return $this;
+    }
+
+    public function name($name)
+    {
+      $this->name = $name;
+      return $this;
+    }
+
+    public function get()
+    {
+        if ($this->type === 'per') {
+            $this->couponData['percent_off'] = $this->amount;
+        } else {
+            $this->couponData['amount_off'] = $this->amount;
+            $this->couponData['currency'] = $this->currency;
+        }
+
+        if ($this->name) {
+            $this->couponData['name'] = $this->name;
+            $this->couponData['id'] = $this->name;
+        }
+        if ($this->duration === 'forever' || $this->duration === 'once') {
+            $this->couponData['duration'] = $this->duration;
+        } else {
+            $this->couponData['duration'] = $this->duration;
+            $this->couponData['duration_in_months'] = $this->durationMonth;
+        }
+
+       try {
+         Stripe::setApiKey($this->secretKey);
+         $coupon = Coupon::create($this->couponData);
+         return $coupon;
+       } catch (\Exception $e) {
+         return (object)['isError' => 'true','message'=> $e->getMessage()];
+       }
+    }
+
+    public function delete($id)
     {
         try {
-            Stripe::setApiKey($this->secretKey);
-            $infos = Session::retrieve($sessionToken);
-            return $infos;
+          Stripe::setApiKey($this->secretKey);
+          $coupon = Coupon::retrieve($id);
+          $coupon->delete();
+          return $coupon;
         } catch (\Exception $e) {
-            return (object)['isError' => 'true','message'=> $e->getMessage()];
+          return (object)['isError' => 'true','message'=> $e->getMessage()];
         }
     }
 
-    /**
-     * Checkout refund
-     * Store payment_intent when checkout success in DB.
-     * @param  string $payment_intent get from database
-     * @return object
-     */
-    public function refund($payment_intent)
-    {
-        try {
-            Stripe::setApiKey($this->secretKey);
-            $intent = \Stripe\PaymentIntent::retrieve($payment_intent);
-            $re = \Stripe\Refund::create([
-              'charge' => $intent->charges->data[0]->id
-            ]);
-            return $re;
-        } catch (\Exception $e) {
-            return (object)['isError' => 'true','message'=> $e->getMessage()];
-        }
-    }
 
-    public function storeFuture($session)
-    {
-        try{
-            $dummyCard = 'tok_amex';
-            Stripe::setApiKey($this->secretKey);
-            $sessionData = $this->retrieve($session);
-            $r = \Stripe\SetupIntent::retrieve($sessionData->setup_intent);
-            $customer = Customer::create(['source'=>$dummyCard]);
-            $payment_method = \Stripe\PaymentMethod::retrieve($r->payment_method);
-            $payment_method->attach(['customer' => $customer->id]);
-            return (object) ['customer' => $payment_method->customer,'ref'=>$sessionData->client_reference_id];
-        } catch (\Exception $e) {
-            return (object)['isError' => 'true','message'=> $e->getMessage()];
-        }
-
-    }
 }
