@@ -7,7 +7,7 @@ namespace Code4mk\LaraStripe;
  * @copyright Kawsar Soft. (http://kawsarsoft.com)
  */
 
- use Stripe\Product;
+use Stripe\Product;
 use Stripe\Stripe;
 use Stripe\Plan;
 use Config;
@@ -23,10 +23,6 @@ class StripePlans
      * @var string
      */
     private $secretKey;
-    /**
-     * Customer all data after create
-     * @var object
-     */
 
     /**
      * Set currency for plan.
@@ -35,8 +31,8 @@ class StripePlans
     private $currency;
 
     /**
-     * [private description]
-     * @var [type]
+     * plan billing recurring interval
+     * @var string
      */
     private $interval;
 
@@ -46,8 +42,16 @@ class StripePlans
      */
     private $amount;
 
+    /**
+     * Plan products
+     * @var array
+     */
     private $product = [];
 
+    /**
+     * Plan extra properties
+     * @var array
+     */
     private $extra = [];
 
     /**
@@ -75,30 +79,56 @@ class StripePlans
         return $this;
     }
 
+    /**
+     * Plan products
+     * @param  aray $data
+     * @source https://stripe.com/docs/api/plans/create#create_plan-product
+     * @return $this
+     */
     public function product($data)
     {
       $this->product = $data;
       return $this;
     }
 
+    /**
+     * Plan price
+     * @param  int|float $amount
+     * @return $this
+     */
     public function amount($amount)
     {
       $this->amount = round($amount,2) * 100;
       return $this;
     }
 
+    /**
+     * Plan recurring interval
+     * @param  string $type [day,week,month,year]
+     * @return $this
+     */
     public function interval($type)
     {
       $this->interval = $type;
       return $this;
     }
 
+    /**
+     * Plan currency
+     * @param   $currency
+     * @return $this
+     */
     public function currency($currency)
     {
       $this->currency = $currency;
       return $this;
     }
 
+    /**
+     * Plan extra properties
+     * @param  array $data associate array
+     * @return $this
+     */
     public function extra ($data)
     {
         $this->extra = $data;
@@ -130,7 +160,7 @@ class StripePlans
            'interval' => $this->interval,
            'product' => $this->product,
            'trial_period_days' => $this->trial,
-           // $this->extra
+           $this->extra
          ]);
          return $plan;
        } catch (\Exception $e) {
@@ -148,28 +178,6 @@ class StripePlans
         try {
             Stripe::setApiKey($this->secretKey);
             $plan = Plan::retrieve($id);
-            return $plan;
-        } catch (\Exception $e) {
-            return (object)['isError' => 'true','message'=> $e->getMessage()];
-        }
-    }
-
-    /**
-     * Delete a plan and same time delete product.
-     * @param  string $id
-     * @return object
-     */
-    public function delete($id)
-    {
-        try {
-            Stripe::setApiKey($this->secretKey);
-            $plan = Plan::retrieve($id);
-            $product = $plan->product;
-            $plan->delete();
-
-            $getProduct = Product::retrieve($product);
-            $getProduct->delete();
-
             return $plan;
         } catch (\Exception $e) {
             return (object)['isError' => 'true','message'=> $e->getMessage()];
@@ -209,6 +217,28 @@ class StripePlans
                 $id,
                 ['active' => false]
             );
+            return $plan;
+        } catch (\Exception $e) {
+            return (object)['isError' => 'true','message'=> $e->getMessage()];
+        }
+    }
+
+    /**
+     * Delete a plan and same time delete product.
+     * @param  string $id
+     * @return object
+     */
+    public function delete($id)
+    {
+        try {
+            Stripe::setApiKey($this->secretKey);
+            $plan = Plan::retrieve($id);
+            $product = $plan->product;
+            $plan->delete();
+
+            $getProduct = Product::retrieve($product);
+            $getProduct->delete();
+
             return $plan;
         } catch (\Exception $e) {
             return (object)['isError' => 'true','message'=> $e->getMessage()];

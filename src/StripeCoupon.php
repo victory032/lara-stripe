@@ -7,10 +7,11 @@ namespace Code4mk\LaraStripe;
  * @copyright Kawsar Soft. (http://kawsarsoft.com)
  */
 
+use Illuminate\Support\Str;
  use Stripe\Stripe;
  use Stripe\Coupon;
  use Config;
- 
+
 /**
  * Coupon class
  * @source https://stripe.com/docs/api/coupons
@@ -84,6 +85,14 @@ class StripeCoupon
         return $this;
     }
 
+    /**
+     * Coupon amount
+     * @param  int|float $amount
+     * @param  string $type     [fixed,per]
+     * @param  string $currency  fixed amount purpose
+     * @source https://stripe.com/docs/api/coupons/object#coupon_object-amount_off
+     * @return $this
+     */
     public function amount($amount,$type,$currency = 'usd')
     {
         if ($type === 'fixed') {
@@ -94,10 +103,16 @@ class StripeCoupon
             $this->amount = $amount;
             $this->type = 'per';
         }
-
       return $this;
     }
 
+    /**
+     * Coupon duration
+     * @param  string  $type  [forever,once,repeating]
+     * @param  integer $month
+     * @source https://stripe.com/docs/api/coupons/create#create_coupon-duration
+     * @return $this
+     */
     public function duration($type,$month = 1)
     {
         //forever, once, or repeating.
@@ -108,12 +123,21 @@ class StripeCoupon
       return $this;
     }
 
+    /**
+     * Coupon name & id
+     * @param  string $name snake_case
+     * @return $this
+     */
     public function name($name)
     {
-      $this->name = $name;
+      $this->name = Str::snake($name);
       return $this;
     }
 
+    /**
+     * Create coupon & retrieve data
+     * @return  object
+     */
     public function get()
     {
         if ($this->type === 'per') {
@@ -127,6 +151,7 @@ class StripeCoupon
             $this->couponData['name'] = $this->name;
             $this->couponData['id'] = $this->name;
         }
+
         if ($this->duration === 'forever' || $this->duration === 'once') {
             $this->couponData['duration'] = $this->duration;
         } else {
@@ -139,10 +164,15 @@ class StripeCoupon
          $coupon = Coupon::create($this->couponData);
          return $coupon;
        } catch (\Exception $e) {
-         return (object)['isError' => 'true','message'=> $e->getMessage()];
+         return (object)['isError' => 'true','message'=> $e->getMessage(),'stripe' => $e->getJsonBody()['error']];
        }
     }
-    
+
+    /**
+     * Delete a coupon
+     * @param  string $id coupon id
+     * @return object
+     */
     public function delete($id)
     {
         try {
@@ -151,9 +181,7 @@ class StripeCoupon
           $coupon->delete();
           return $coupon;
         } catch (\Exception $e) {
-          return (object)['isError' => 'true','message'=> $e->getMessage()];
+          return (object)['isError' => 'true','message'=> $e->getMessage(),'stripe' => $e->getJsonBody()['error']];
         }
     }
-
-
 }

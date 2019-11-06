@@ -23,8 +23,9 @@ class StripeSubscription
      * @var string
      */
     private $secretKey;
+
     /**
-     * Customer all data after create.
+     * Subscription Customer
      * @var object
      */
     private $customer;
@@ -59,6 +60,12 @@ class StripeSubscription
      * @var integer
      */
     private $trial;
+
+    /**
+     * Card source
+     * @var string
+     */
+    private $source;
 
     /**
      * Subcription with coupon.
@@ -142,6 +149,16 @@ class StripeSubscription
     }
 
     /**
+     * set customer card source
+     * @param  string $code
+     * @return $this
+     */
+    public function source($code) {
+        $this->source = $code;
+        return $this;
+    }
+
+    /**
      * Coupon apply
      * @param  string $code
      * @return $this
@@ -167,6 +184,9 @@ class StripeSubscription
         }
         if ($this->coupon) {
             $this->createSubscriptionData['coupon'] = $this->coupon;
+        }
+        if ($this->source) {
+            $this->createSubscriptionData['default_source'] = $this->source;
         }
         $subsData = array_merge($this->createSubscriptionData,$this->extra);
 
