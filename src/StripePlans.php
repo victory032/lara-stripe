@@ -1,14 +1,21 @@
 <?php
 namespace Code4mk\LaraStripe;
 
-use Stripe\Customer;
+/**
+ * @author    @code4mk <hiremostafa@gmail.com>
+ * @author    @kawsarsoft <with@kawsarsoft.com>
+ * @copyright Kawsar Soft. (http://kawsarsoft.com)
+ */
+
+ use Stripe\Product;
 use Stripe\Stripe;
 use Stripe\Plan;
-use Stripe\Product;
 use Config;
 
-// https://stripe.com/docs/api/plans/create
-
+/**
+ * Plan class.
+ * @source https://stripe.com/docs/api/plans/create
+ */
 class StripePlans
 {
     /**
@@ -20,16 +27,33 @@ class StripePlans
      * Customer all data after create
      * @var object
      */
+
+    /**
+     * Set currency for plan.
+     * @var string
+     */
     private $currency;
 
+    /**
+     * [private description]
+     * @var [type]
+     */
     private $interval;
 
+    /**
+     * Plan price.
+     * @var integer|float
+     */
     private $amount;
 
     private $product = [];
 
     private $extra = [];
 
+    /**
+     * Trail day
+     * @var integer
+     */
     private $trial;
 
     public function __construct()
@@ -81,12 +105,21 @@ class StripePlans
         return $this;
     }
 
+    /**
+     * Plan trial time (day).
+     * @param  integer $day
+     * @return $this
+     */
     public function trial($day)
     {
         $this->trial = $day;
         return $this;
     }
 
+    /**
+     * Create plan & retrive data.
+     * @return object
+     */
     public function get()
     {
        try {
@@ -105,6 +138,11 @@ class StripePlans
        }
     }
 
+    /**
+     * Retrieve a plan with $id.
+     * @param  string $id
+     * @return object
+     */
     public function retrieve($id)
     {
         try {
@@ -116,6 +154,11 @@ class StripePlans
         }
     }
 
+    /**
+     * Delete a plan and same time delete product.
+     * @param  string $id
+     * @return object
+     */
     public function delete($id)
     {
         try {
@@ -133,6 +176,11 @@ class StripePlans
         }
     }
 
+    /**
+     * Active a plan
+     * @param  string $id
+     * @return object
+     */
     public function active($id)
     {
         try {
@@ -148,6 +196,11 @@ class StripePlans
         }
     }
 
+    /**
+     * Deactive a plan.
+     * @param  string $id
+     * @return $this
+     */
     public function deactive($id)
     {
         try {

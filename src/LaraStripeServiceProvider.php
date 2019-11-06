@@ -4,8 +4,8 @@ namespace Code4mk\LaraStripe;
 
 /**
  * @author    @code4mk <hiremostafa@gmail.com>
- * @author    @0devco <with@0dev.co>
- * @copyright 0dev.co (https://0dev.co)
+ * @author    @kawsarsoft <with@kawsarsoft.com>
+ * @copyright Kawsar Soft. (http://kawsarsoft.com)
  */
 
 use Illuminate\Support\ServiceProvider;
@@ -14,6 +14,9 @@ use Code4mk\LaraStripe\StripeCharge;
 use Code4mk\LaraStripe\StripeCheckout;
 use Code4mk\LaraStripe\StripeBalance;
 use Code4mk\LaraStripe\StripeCustomer;
+use Code4mk\LaraStripe\StripePlans;
+use Code4mk\LaraStripe\StripeCoupon;
+use Code4mk\LaraStripe\StripeSubscription;
 
 class LaraStripeServiceProvider extends ServiceProvider
 {
@@ -35,6 +38,10 @@ class LaraStripeServiceProvider extends ServiceProvider
       AliasLoader::getInstance()->alias('LaraStripeCheckout', 'Code4mk\LaraStripe\Facades\LStripeCheckout');
       AliasLoader::getInstance()->alias('LaraStripeBalance', 'Code4mk\LaraStripe\Facades\LStripeBalance');
       AliasLoader::getInstance()->alias('LaraStripeCustomer', 'Code4mk\LaraStripe\Facades\LStripeCustomer');
+      AliasLoader::getInstance()->alias('LaraStripeCoupon', 'Code4mk\LaraStripe\Facades\LStripeCoupon');
+      AliasLoader::getInstance()->alias('LaraStripePlan', 'Code4mk\LaraStripe\Facades\LStripePlan');
+      AliasLoader::getInstance()->alias('LaraStripeSubs', 'Code4mk\LaraStripe\Facades\LStripeSubscription');
+
    }
 
   /**
@@ -58,6 +65,18 @@ class LaraStripeServiceProvider extends ServiceProvider
 
      $this->app->bind('laraStripeCustomer', function () {
          return new StripeCustomer;
+     });
+
+     $this->app->bind('laraStripeCoupon', function () {
+         return new StripeCoupon;
+     });
+
+     $this->app->bind('laraStripePlan', function () {
+         return new StripePlans;
+     });
+
+     $this->app->bind('laraStripeSubscription', function () {
+         return new StripeSubscription;
      });
 
    }

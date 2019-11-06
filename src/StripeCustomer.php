@@ -3,8 +3,8 @@ namespace Code4mk\LaraStripe;
 
 /**
  * @author    @code4mk <hiremostafa@gmail.com>
- * @author    @0devco <with@0dev.co>
- * @copyright 0dev.co (https://0dev.co)
+ * @author    @kawsarsoft <with@kawsarsoft.com>
+ * @copyright Kawsar Soft. (http://kawsarsoft.com)
  */
 
 // https://stripe.com/docs/saving-cards

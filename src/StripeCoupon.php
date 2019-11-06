@@ -1,12 +1,20 @@
 <?php
 namespace Code4mk\LaraStripe;
 
-use Stripe\Stripe;
-use Stripe\Coupon;
-use Config;
+/**
+ * @author    @code4mk <hiremostafa@gmail.com>
+ * @author    @kawsarsoft <with@kawsarsoft.com>
+ * @copyright Kawsar Soft. (http://kawsarsoft.com)
+ */
 
-// https://stripe.com/docs/api/coupons
-
+ use Stripe\Stripe;
+ use Stripe\Coupon;
+ use Config;
+ 
+/**
+ * Coupon class
+ * @source https://stripe.com/docs/api/coupons
+ */
 class StripeCoupon
 {
     /**
@@ -14,17 +22,47 @@ class StripeCoupon
      * @var string
      */
     private $secretKey;
+
     /**
-     * Customer all data after create
-     * @var object
+     * Currency when coupon amount is fixed
+     * @var string
      */
     private $currency;
 
+    /**
+     * Coupon amount
+     * @var integer|float
+     */
     private $amount;
+
+    /**
+     * Coupon amount type
+     * @var string per or fixed
+     */
     private $type;
+
+    /**
+     * Coupon duration
+     * @var string once
+     */
     private $duration;
+
+    /**
+     * Coupon name & coupon id
+     * @var string must be camel_case
+     */
     private $name;
+
+    /**
+     * Coupon duration month
+     * @var integer
+     */
     private $durationMonth;
+
+    /**
+     * All coupon data for create
+     * @var [type]
+     */
     private $couponData;
 
     public function __construct()

@@ -1,35 +1,69 @@
 <?php
 namespace Code4mk\LaraStripe;
 
-use Stripe\Customer;
-use Stripe\Stripe;
+/**
+ * @author    @code4mk <hiremostafa@gmail.com>
+ * @author    @kawsarsoft <with@kawsarsoft.com>
+ * @copyright Kawsar Soft. (http://kawsarsoft.com)
+ */
+
 use Stripe\Subscription;
+use Stripe\Stripe;
 use Config;
 
-// https://stripe.com/docs/api/subscriptions/create
-
+/**
+ * Subscription class
+ *
+ * @source  https://stripe.com/docs/api/subscriptions/create
+ */
 class StripeSubscription
 {
     /**
-     * Secret key
+     * Secret key.
      * @var string
      */
     private $secretKey;
     /**
-     * Customer all data after create
+     * Customer all data after create.
      * @var object
      */
     private $customer;
 
+    /**
+     * All data which properties of create the subscription.
+     * @var array
+     */
     private $createSubscriptionData = [];
 
+    /**
+     * Plan which will be subcription.
+     * @var string
+     */
     private $plan;
 
+    /**
+     * Add others properties of create the subscription.
+     * @var array
+     */
     private $extra = [];
-    // trail day from plan
+
+    /**
+     * Trial default from plan.
+     * @var boolean
+     */
     private $trialPlan = false;
 
+    /**
+     * How many trial day for subscription.
+     * This will be override the plan trial day.
+     * @var integer
+     */
     private $trial;
+
+    /**
+     * Subcription with coupon.
+     * @var string
+     */
     private $coupon;
 
     public function __construct()
@@ -39,7 +73,7 @@ class StripeSubscription
         }
     }
     /**
-     * Set secret key
+     * Set secret key.
      * @param  string $data
      * @return $this
      */
@@ -51,18 +85,33 @@ class StripeSubscription
         return $this;
     }
 
+    /**
+     * set customer id which create by customer alias.
+     * @param  string $id customer id
+     * @return $this
+     */
     public function customer($id)
     {
       $this->customer = $id;
       return $this;
     }
 
+    /**
+     * Plan id which generate by LaraStripePlan  alias.
+     * @param  string $id plan id
+     * @return $this
+     */
     public function plan($id)
     {
       $this->plan = $id;
       return $this;
     }
 
+    /**
+     * stripe subscription others properties which not declare this package.
+     * @param  array  $data
+     * @return $this
+     */
     public function extra($data = [])
     {
       if (is_array($data)) {
@@ -71,22 +120,41 @@ class StripeSubscription
       return $this;
     }
 
+    /**
+     * Default trial time from plan.
+     * @return $this
+     */
     public function trialPlan()
     {
         $this->trialPlan = true;
         return $this;
     }
 
+    /**
+     * Set subscription trial.
+     * override the plan trial day.
+     * @param  integer $day
+     * @return $this
+     */
     public function trial($day) {
         $this->trial = $day;
         return $this;
     }
 
+    /**
+     * Coupon apply
+     * @param  string $code
+     * @return $this
+     */
     public function coupon($code) {
         $this->coupon = $code;
         return $this;
     }
 
+    /**
+     * Create & retreive all data.
+     * @return object
+     */
     public function get()
     {
         $this->createSubscriptionData['customer'] = $this->customer;
@@ -111,6 +179,11 @@ class StripeSubscription
        }
     }
 
+    /**
+     * Retrieve a subscription with id
+     * @param  string $id
+     * @return object
+     */
     public function retrieve($id)
     {
         try {
@@ -122,6 +195,11 @@ class StripeSubscription
         }
     }
 
+    /**
+     * Cancel a subscription.
+     * @param  string $id
+     * @return object
+     */
     public function cancel($id)
     {
         try {
