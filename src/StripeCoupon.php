@@ -7,7 +7,7 @@ namespace Code4mk\LaraStripe;
  * @copyright Kawsar Soft. (http://kawsarsoft.com)
  */
 
-use Illuminate\Support\Str;
+ use Illuminate\Support\Str;
  use Stripe\Stripe;
  use Stripe\Coupon;
  use Config;
