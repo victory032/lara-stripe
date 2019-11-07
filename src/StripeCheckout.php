@@ -8,9 +8,10 @@ namespace Code4mk\LaraStripe;
  */
 
 use Stripe\Checkout\Session;
+use Stripe\PaymentIntent;
+use Stripe\Customer;
 use Stripe\Stripe;
 use Stripe\Refund;
-use Stripe\Customer;
 use Config;
 
 class StripeCheckout
@@ -243,5 +244,30 @@ class StripeCheckout
             return (object)['isError' => 'true','message'=> $e->getMessage()];
         }
 
+    }
+
+    public function status($sessionToken)
+    {
+        try {
+            Stripe::setApiKey($this->secretKey);
+            $session = Session::retrieve($sessionToken);
+            $pi = PaymentIntent::retrieve(
+              $session->payment_intent
+            );
+            // if ($pi->status === 'succeeded') {
+            //     return (object) [
+            //         'status' => $pi->status,
+            //         'sessions'   => $session,
+            //     ];
+            // }
+            return (object) [
+                'status' => $pi->status,
+                'ref_id' => $session->client_reference_id,
+                'sessions'   => $session,
+            ];
+
+        } catch (\Exception $e) {
+            return (object)['isError' => 'true','message'=> $e->getMessage()];
+        }
     }
 }
