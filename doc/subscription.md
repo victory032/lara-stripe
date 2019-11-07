@@ -2,7 +2,7 @@
 
 lara-stripe has `LaraStripeSubs` alias for subscription related task.
 
-#Methods
+# Methods
 
 ## `setup()` `required`
 
@@ -68,7 +68,19 @@ Subscription with a coupon
 coupon('coupon_code')
 ```
 
-## get() `required`
+## extra `optional`
+
+Add optional attributes which are not include this package for creating subscription.
+
+* [all attributes lists](https://stripe.com/docs/api/subscriptions/create)
+
+```php
+extra([
+     .....
+])
+```
+
+## `get()` `required`
 
 * create the subscription and retrive created subscription data.
 * return `object`

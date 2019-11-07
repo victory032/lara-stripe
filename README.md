@@ -24,7 +24,8 @@ php artisan vendor:publish --provider="Code4mk\LaraStripe\LaraStripeServiceProvi
 * [Checkout doc](https://github.com/code4mk/lara-stripe/blob/master/doc/payment-checkout.md)
 * [Customer doc](https://github.com/code4mk/lara-stripe/blob/master/doc/customer.md)
 * [Plan doc](https://github.com/code4mk/lara-stripe/blob/master/doc/plan.md)
-* [Subscription doc](https://github.com/code4mk/lara-stripe/blob/master/doc/subscription.md)a
+* [Subscription doc](https://github.com/code4mk/lara-stripe/blob/master/doc/subscription.md)
+* [Coupon doc](https://github.com/code4mk/lara-stripe/blob/master/doc/coupon.md)
 
 # Demo repo
 
