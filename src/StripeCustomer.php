@@ -123,18 +123,74 @@ class StripeCustomer
 
     }
 
+    public function cards($cusId)
+    {
+        try {
+            Stripe::setApiKey($this->secretKey);
+            $cus = Customer::retrieve($cusId);
+            $data = [];
+            $cards = $cus->sources->data;
+            $defaultCard = $cus->default_source;
+
+            foreach ($cards as $key => $value) {
+                if ($value->id === $defaultCard) {
+                    $data[$key] = ['cardId' => $value->id,'last4' => $value->last4,'brand' =>$value->brand,'customer' => $value->customer ,'isDefault' => true ];
+                } else {
+                    $data[$key] = ['cardId' => $value->id,'last4' => $value->last4,'brand' =>$value->brand,'customer' => $value->customer,'isDefault' => false  ];
+                }
+            }
+            return $data;
+
+        } catch (\Exception $e) {
+            return (object)['isError' => 'true','message'=> $e->getMessage()];
+        }
+    }
+
+
+    public function addCard($cusId,$cardToken,$max=3)
+    {
+        try {
+            Stripe::setApiKey($this->secretKey);
+            if (count($this->cards($cusId)) <= $max-1) {
+                $cus = Customer::createSource($cusId,[
+                    'source' => $cardToken
+                ]);
+                return $cus;
+            }
+            return "You already exceed card quota ${max}";
+
+        } catch (\Exception $e) {
+            return (object)['isError' => 'true','message'=> $e->getMessage()];
+        }
+    }
+
+    public function deleteCard($cusId,$cardToken)
+    {
+        try {
+            Stripe::setApiKey($this->secretKey);
+            if (count($this->cards($cusId)) > 1) {
+                $cus = Customer::deleteSource($cusId,$cardToken);
+                return $cus;
+            }
+            return "you can't delete the card";
+
+        } catch (\Exception $e) {
+            return (object)['isError' => 'true','message'=> $e->getMessage()];
+        }
+    }
+
     /**
-     * Change customer card.
-     * @param  string $cusId     [description]
-     * @param  string $cardToken create with stripe.js or manually create.
+     * Set customer default card.
+     * @param  string $cusId
+     * @param  string $cusSourceId
      * @return object
      */
-    public function changeCard($cusId,$cardToken)
+    public function setDefaultCard($cusId,$cusSourceId)
     {
         try {
             Stripe::setApiKey($this->secretKey);
             $cus = Customer::update($cusId,[
-                'source' => $cardToken
+                'default_source' => $cusSourceId
             ]);
             return $cus;
         } catch (\Exception $e) {
