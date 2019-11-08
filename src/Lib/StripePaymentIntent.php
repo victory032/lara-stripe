@@ -1,5 +1,5 @@
 <?php
-namespace Code4mk\LaraStripe;
+namespace Code4mk\LaraStripe\Lib;
 
 /**
  * @author    @code4mk <hiremostafa@gmail.com>
@@ -11,9 +11,10 @@ use Stripe\Stripe;
 use Stripe\Token;
 use Stripe\Charge;
 use Stripe\Balance;
+use Stripe\PaymentIntent;
 use Config;
 
-class StripeBalance
+class StripePaymentIntent
 {
     /**
      * secret key
@@ -45,11 +46,14 @@ class StripeBalance
      * Get balance
      * @return object
      */
-    public function get()
+    public function create()
     {
         try {
             Stripe::setApiKey($this->secretKey);
-            return Balance::retrieve();
+            return PaymentIntent::create([
+                'amount' => 1000,
+                'currency' => 'usd'
+            ]);
         } catch (\Exception $e) {
             return (object)['isError' => 'true','message'=> $e->getMessage()];
         }

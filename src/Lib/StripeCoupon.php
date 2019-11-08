@@ -1,5 +1,5 @@
 <?php
-namespace Code4mk\LaraStripe;
+namespace Code4mk\LaraStripe\Lib;
 
 /**
  * @author    @code4mk <hiremostafa@gmail.com>

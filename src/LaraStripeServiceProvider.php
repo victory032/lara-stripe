@@ -10,13 +10,13 @@ namespace Code4mk\LaraStripe;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Foundation\AliasLoader;
-use Code4mk\LaraStripe\StripeCharge;
-use Code4mk\LaraStripe\StripeCheckout;
-use Code4mk\LaraStripe\StripeBalance;
-use Code4mk\LaraStripe\StripeCustomer;
-use Code4mk\LaraStripe\StripePlans;
-use Code4mk\LaraStripe\StripeCoupon;
-use Code4mk\LaraStripe\StripeSubscription;
+use Code4mk\LaraStripe\Lib\StripeCharge;
+use Code4mk\LaraStripe\Lib\StripeCheckout;
+use Code4mk\LaraStripe\Lib\StripeBalance;
+use Code4mk\LaraStripe\Lib\StripeCustomer;
+use Code4mk\LaraStripe\Lib\StripePlans;
+use Code4mk\LaraStripe\Lib\StripeCoupon;
+use Code4mk\LaraStripe\Lib\StripeSubscription;
 
 class LaraStripeServiceProvider extends ServiceProvider
 {
